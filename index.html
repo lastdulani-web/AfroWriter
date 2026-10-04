@@ -43,7 +43,7 @@ main{flex:1;overflow-y:auto;padding:14px 10px calc(14px + env(safe-area-inset-bo
 #ed ul,#ed ol{padding-left:1.4em}
 footer{font:12px system-ui,sans-serif;color:var(--mute);text-align:center;padding:6px 0 calc(6px + env(safe-area-inset-bottom));background:var(--paper);border-top:1px solid var(--line)}
 @media(prefers-reduced-motion:no-preference){#status{transition:opacity .3s}}
-body.focus #bar,body.focus footer{display:none}
+body.focus #bar,body.focus footer,body.focus #tabs{display:none}
 .only-lyrics,.only-essay{display:none}
 body[data-mode=lyrics] .only-lyrics,body[data-mode=essay] .only-essay{display:block}
 body[data-mode=prose] #ed div,body[data-mode=prose] #ed p{text-indent:1.5em;margin:0;line-height:1.75}
@@ -69,9 +69,25 @@ body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.
 .info .s{display:block;font-size:12px;color:var(--mute)}
 .row .ib{flex:none;display:grid;place-items:center;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;width:36px;height:36px}
 .empty{padding:20px;text-align:center;color:var(--mute);font-size:14px}
+#tabs{display:flex;align-items:stretch;gap:4px;overflow-x:auto;padding:6px 8px 0;background:var(--bg);border-bottom:1px solid var(--line);font-family:system-ui,sans-serif;scrollbar-width:none}
+#tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:flex;align-items:center;max-width:180px;border:1px solid transparent;border-bottom:0;border-radius:8px 8px 0 0}
+.tab.on{background:var(--paper);border-color:var(--line);margin-bottom:-1px}
+.tab .tl{border:0;background:none;color:var(--mute);font:13px system-ui,sans-serif;padding:8px 4px 8px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.tab.on .tl{color:var(--ink);font-weight:600}
+.tab .tx{border:0;background:none;color:var(--mute);font-size:17px;line-height:1;padding:6px 9px}
+.tab:only-of-type .tx{display:none}
+.tab:only-of-type .tl{padding-right:10px}
+#tplus{flex:none;border:0;background:none;color:var(--ink);font-size:20px;padding:0 12px}
+footer{display:flex;justify-content:center;align-items:center;gap:10px}
+#state{border:1px solid var(--line);background:none;color:var(--mute);border-radius:999px;padding:2px 11px;font:12px system-ui,sans-serif}
+#state.fin{background:var(--pop);border-color:var(--pop);color:#fff}
+.flt{display:flex;gap:6px;padding:8px 14px 2px}
+.flt button{border:1px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:3px 12px;font-size:13px}
+.flt button.on{background:var(--brand);border-color:var(--brand);color:#fff}
 @media print{
 :root,:root:not([data-theme=light]),:root[data-theme=dark],:root[data-theme=light]{--paper:#fff;--ink:#000;--mute:#444;--line:#bbb;--bg:#fff;--pop:#444}
-header,#bar,footer,#docs{display:none!important}
+header,#bar,#tabs,footer,#docs{display:none!important}
 html,body{height:auto;background:#fff;color:#000;padding:0}
 body{display:block}
 main{overflow:visible;padding:0}
@@ -93,6 +109,7 @@ main{overflow:visible;padding:0}
   <button id="docsbtn" aria-label="My documents" title="My documents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
   <button id="newdoc">New</button>
 </header>
+<div id="tabs" role="tablist" aria-label="Open pieces"></div>
 <div id="bar" role="toolbar" aria-label="Formatting">
   <button data-c="bold" aria-label="Bold"><b>B</b></button>
   <button data-c="italic" aria-label="Italic"><i>I</i></button>
@@ -161,30 +178,31 @@ main{overflow:visible;padding:0}
     <div id="ed" contenteditable="true" data-ph="Start writing here. Everything saves on your device." spellcheck="true"></div>
   </div>
 </main>
-<footer id="count">0 words</footer>
+<footer><button id="state" aria-label="Draft. Tap to mark as finished">Draft</button><span id="count">0 words</span></footer>
 <div id="docs" hidden>
   <div class="sheet" role="dialog" aria-label="Documents">
     <div class="dh"><b>My documents</b><button id="dnew">+ New piece</button><button id="dclose" aria-label="Close">&times;</button></div>
+    <div class="flt"><button data-f="all" class="on">All</button><button data-f="draft">Drafts</button><button data-f="final">Finished</button></div>
     <div id="dlist"></div>
   </div>
 </div>
 <script>
 const $=s=>document.querySelector(s), ed=$('#ed'), title=$('#title'), st=$('#status'), K='afrowriter:doc';
-let t,mode='prose',goal=0;
+let t,mode='prose',goal=0,dstate='draft';
 function words(){const n=(ed.innerText.trim().match(/\S+/g)||[]).length;$('#count').textContent=(mode==='essay'&&goal)?n+' / '+goal+' words':n+(n===1?' word':' words')}
 const LK='afrowriter:library',uid=()=>'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let lib={cur:null,docs:{}};
-function snap(){return{t:title.value,h:ed.innerHTML,m:mode,g:goal}}
+function snap(){return{t:title.value,h:ed.innerHTML,m:mode,g:goal,s:dstate}}
 function save(){
   try{
     const s=snap(),o=lib.docs[lib.cur];
-    if(o){const same=o.t===s.t&&o.h===s.h&&o.m===s.m&&o.g===s.g;lib.docs[lib.cur]=Object.assign({},o,s,{at:same?o.at:Date.now()})}
+    if(o){const same=o.t===s.t&&o.h===s.h&&o.m===s.m&&o.g===s.g&&o.s===s.s;lib.docs[lib.cur]=Object.assign({},o,s,{at:same?o.at:Date.now()})}
     localStorage.setItem(LK,JSON.stringify(lib));st.textContent='Saved'
   }catch(e){st.textContent='Could not save: storage full or blocked'}
 }
-function blank(m){return{t:'',h:'',m:m||'prose',g:0,at:Date.now()}}
-function loadDoc(id){const d=lib.docs[id];lib.cur=id;title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0}
-function queue(){st.textContent='Saving...';words();clearTimeout(t);t=setTimeout(save,600)}
+function blank(m){return{t:'',h:'',m:m||'prose',g:0,s:'draft',at:Date.now()}}
+function loadDoc(id){const d=lib.docs[id];lib.cur=id;title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0;dstate=d.s||'draft'}
+function queue(){st.textContent='Saving...';words();updTab();clearTimeout(t);t=setTimeout(save,600)}
 try{const l=JSON.parse(localStorage.getItem(LK)||'null');if(l&&l.docs)lib=l}catch(e){}
 if(!lib.docs[lib.cur]){
   const ids=Object.keys(lib.docs);
@@ -192,6 +210,7 @@ if(!lib.docs[lib.cur]){
   else{let d=null;try{d=JSON.parse(localStorage.getItem(K)||'null')}catch(e){}
     const id=uid();lib.docs[id]=d?Object.assign(blank(),d):blank();lib.cur=id}
 }
+if(!Array.isArray(lib.open))lib.open=[];lib.open=lib.open.filter(x=>lib.docs[x]);if(!lib.open.includes(lib.cur))lib.open.push(lib.cur);
 loadDoc(lib.cur);
 words();
 ed.addEventListener('input',queue);title.addEventListener('input',queue);
@@ -205,7 +224,7 @@ $('#bar').addEventListener('click',e=>{
   if(b.dataset.a==='dbl'){P.dbl=!P.dbl;apply();return}
   ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);queue();
 });
-function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);setMode(mode,true);words();save();scrollTo(0,0);$('main').scrollTop=0}
+function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);if(!lib.open.includes(id))lib.open.push(id);setMode(mode,true);words();save();renderTabs();paintState();scrollTo(0,0);$('main').scrollTop=0}
 function newPiece(){
   clearTimeout(t);save();
   const c=lib.docs[lib.cur];
@@ -218,9 +237,31 @@ const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 const wcount=x=>(x||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').split(/\s+/).filter(Boolean).length;
 function ago(ts){const m=Math.floor((Date.now()-ts)/6e4);if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.floor(m/60);if(h<24)return h+' h ago';const d=Math.floor(h/24);return d+(d===1?' day ago':' days ago')}
 function renderDocs(){
-  const items=Object.entries(lib.docs).sort((a,b)=>b[1].at-a[1].at);
-  $('#dlist').innerHTML=items.map(([id,d])=>'<div class="row'+(id===lib.cur?' cur':'')+'" data-id="'+id+'"><button class="info" data-o="1"><span class="n">'+esc(d.t||'Untitled')+'</span><span class="s">'+d.m[0].toUpperCase()+d.m.slice(1)+' &middot; '+wcount(d.h)+' words &middot; '+ago(d.at)+'</span></button><button class="ib" data-r="1" aria-label="Rename">'+IC.pen+'</button><button class="ib" data-x="1" aria-label="Delete">'+IC.del+'</button></div>').join('')||'<div class="empty">No pieces yet</div>';
+  const items=Object.entries(lib.docs).filter(([,d])=>dfilter==='all'||(d.s||'draft')===dfilter).sort((a,b)=>b[1].at-a[1].at);
+  $('#dlist').innerHTML=items.map(([id,d])=>'<div class="row'+(id===lib.cur?' cur':'')+'" data-id="'+id+'"><button class="info" data-o="1"><span class="n">'+esc(d.t||'Untitled')+'</span><span class="s">'+d.m[0].toUpperCase()+d.m.slice(1)+' &middot; '+(d.s==='final'?'Finished':'Draft')+' &middot; '+wcount(d.h)+' words &middot; '+ago(d.at)+'</span></button><button class="ib" data-r="1" aria-label="Rename">'+IC.pen+'</button><button class="ib" data-x="1" aria-label="Delete">'+IC.del+'</button></div>').join('')||'<div class="empty">No pieces yet</div>';
 }
+let dfilter='all';
+function updTab(){const l=document.querySelector('#tabs .on .tl');if(l)l.textContent=title.value.trim()||'Untitled'}
+function renderTabs(){
+  const bar=$('#tabs');
+  bar.innerHTML=lib.open.map(id=>{const d=lib.docs[id],on=id===lib.cur,n=on?title.value.trim():(d.t||'');return '<div class="tab'+(on?' on':'')+'" data-id="'+id+'" role="tab" aria-selected="'+on+'"><button class="tl">'+esc(n||'Untitled')+'</button><button class="tx" aria-label="Close tab">&times;</button></div>'}).join('')+'<button id="tplus" aria-label="New piece">+</button>';
+  const on=bar.querySelector('.on');if(on)on.scrollIntoView({inline:'nearest',block:'nearest'});
+}
+function closeTab(id){
+  clearTimeout(t);save();
+  const i=lib.open.indexOf(id);if(i<0||lib.open.length<2)return;
+  lib.open.splice(i,1);
+  if(id!==lib.cur){save();renderTabs();return}
+  openDoc(lib.open[Math.min(i,lib.open.length-1)]);
+}
+$('#tabs').addEventListener('click',e=>{
+  if(e.target.closest('#tplus')){newPiece();return}
+  const tb=e.target.closest('.tab');if(!tb)return;const id=tb.dataset.id;
+  if(e.target.closest('.tx'))closeTab(id);else if(id!==lib.cur)openDoc(id);
+});
+function paintState(){const b=$('#state'),f=dstate==='final';b.textContent=f?'Finished':'Draft';b.classList.toggle('fin',f);b.setAttribute('aria-label',f?'Finished. Tap to mark as draft':'Draft. Tap to mark as finished')}
+$('#state').onclick=()=>{dstate=dstate==='final'?'draft':'final';paintState();queue()};
+$('.flt').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;dfilter=b.dataset.f;document.querySelectorAll('.flt button').forEach(x=>x.classList.toggle('on',x===b));renderDocs()});
 function openDocs(){clearTimeout(t);save();renderDocs();$('#docs').hidden=false}
 function closeDocs(){$('#docs').hidden=true}
 $('#docsbtn').onclick=openDocs;$('#dclose').onclick=closeDocs;$('#dnew').onclick=newPiece;
@@ -228,12 +269,12 @@ $('#docs').addEventListener('click',e=>{if(e.target.id==='docs')closeDocs()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDocs()});
 $('#dlist').addEventListener('click',e=>{
   const row=e.target.closest('.row');if(!row)return;const id=row.dataset.id,d=lib.docs[id];
-  if(e.target.closest('[data-r]')){const v=prompt('Rename this piece',d.t||'');if(v!==null){d.t=v.trim();if(id===lib.cur)title.value=d.t;save();renderDocs()}return}
+  if(e.target.closest('[data-r]')){const v=prompt('Rename this piece',d.t||'');if(v!==null){d.t=v.trim();if(id===lib.cur)title.value=d.t;save();renderDocs();renderTabs()}return}
   if(e.target.closest('[data-x]')){
     if(!confirm('Delete "'+(d.t||'Untitled')+'" from this device? This cannot be undone.'))return;
-    delete lib.docs[id];
-    if(id===lib.cur){const ids=Object.keys(lib.docs).sort((a,b)=>lib.docs[b].at-lib.docs[a].at);const nid=ids[0]||uid();if(!ids.length)lib.docs[nid]=blank(mode);openDoc(nid)}
-    else save();
+    delete lib.docs[id];lib.open=lib.open.filter(x=>x!==id);
+    if(id===lib.cur){const ids=Object.keys(lib.docs).sort((a,b)=>lib.docs[b].at-lib.docs[a].at);const nid=lib.open[0]||ids[0]||uid();if(!lib.docs[nid])lib.docs[nid]=blank(mode);openDoc(nid)}
+    else{save();renderTabs()}
     renderDocs();return
   }
   openDoc(id);closeDocs();
@@ -269,7 +310,7 @@ apply();
 function setMode(m,init){mode=m;document.body.dataset.mode=m;$('#mode').value=m;words();if(!init)queue()}
 $('#mode').addEventListener('change',e=>setMode(e.target.value));
 $('#focus').addEventListener('click',e=>{const on=document.body.classList.toggle('focus');e.currentTarget.setAttribute('aria-pressed',on)});
-setMode(mode,true);
+setMode(mode,true);renderTabs();paintState();
 mq.addEventListener&&mq.addEventListener('change',paintTheme);
 const enc=new TextEncoder();
 const CT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
