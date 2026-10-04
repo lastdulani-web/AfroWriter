@@ -15,6 +15,7 @@
 html,body{height:100%;margin:0}
 body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,"Iowan Old Style",serif;padding-top:env(safe-area-inset-top)}
 header{background:var(--brand);color:#fff;display:flex;align-items:center;gap:10px;padding:8px 12px;font-family:system-ui,sans-serif}
+header .logo{width:34px;height:34px;border-radius:9px;display:block}
 header b{font-size:16px;letter-spacing:.2px}
 header b i{color:#ff9bbd;font-style:normal}
 #status{margin-left:auto;font-size:12px;opacity:.85}
@@ -42,6 +43,7 @@ footer{font:12px system-ui,sans-serif;color:var(--mute);text-align:center;paddin
 </head>
 <body>
 <header>
+  <img src="icon-192.png" alt="" class="logo">
   <b>Afro<i>Writer</i></b>
   <span id="status" aria-live="polite">Ready</span>
   <button id="newdoc">New</button>
