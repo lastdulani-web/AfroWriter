@@ -13,8 +13,8 @@
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#1a1c2e;--ink:#e9eaf5;--mute:#a0a4c4;--line:#2b2e48;--bg:#11121f}}
 :root[data-theme=dark]{--paper:#1a1c2e;--ink:#e9eaf5;--mute:#a0a4c4;--line:#2b2e48;--bg:#11121f}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
-#theme,#focus{background:none;border:1px solid #ffffff66;color:#fff;border-radius:6px;width:34px;height:28px;display:grid;place-items:center;padding:0}
-#theme svg,#focus svg{width:18px;height:18px}#focus[aria-pressed=true]{background:var(--pop);border-color:var(--pop)}#theme:focus-visible,#focus:focus-visible{outline:2px solid var(--pop);outline-offset:1px}
+#theme,#focus,#docsbtn{background:none;border:1px solid #ffffff66;color:#fff;border-radius:6px;width:34px;height:28px;display:grid;place-items:center;padding:0}
+#theme svg,#focus svg,#docsbtn svg{width:18px;height:18px}#focus[aria-pressed=true]{background:var(--pop);border-color:var(--pop)}#theme:focus-visible,#focus:focus-visible,#docsbtn:focus-visible{outline:2px solid var(--pop);outline-offset:1px}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,"Iowan Old Style",serif;padding-top:env(safe-area-inset-top)}
@@ -22,7 +22,7 @@ header{background:var(--brand);color:#fff;display:flex;align-items:center;gap:10
 header .logo{flex:none;width:38px;height:38px;border-radius:10px;display:block;object-fit:contain;background:#fcfcff}
 header b{font-size:16px;letter-spacing:.2px}
 header b i{color:#ff9bbd;font-style:normal}
-#status{margin-left:auto;font-size:12px;opacity:.85}
+#status{margin-left:auto;font-size:12px;opacity:.85;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #newdoc{background:none;border:1px solid #ffffff66;color:#fff;border-radius:6px;padding:4px 10px;font:13px system-ui}
 #bar{display:flex;gap:4px;overflow-x:auto;padding:6px 8px;background:var(--paper);border-bottom:1px solid var(--line);font-family:system-ui,sans-serif}
 #bar button{flex:none;min-width:40px;height:38px;border:0;border-radius:8px;background:none;color:var(--ink);font-size:15px}
@@ -54,6 +54,21 @@ body[data-mode=essay] #ed div,body[data-mode=essay] #ed p{line-height:1.8;margin
 body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.3}
 #bar button[aria-pressed=true]{background:var(--pop);color:#fff}
 #ed .sec{font-family:system-ui,sans-serif;font-weight:700;font-size:.78em;letter-spacing:.1em;text-transform:uppercase;color:var(--pop);margin:1em 0 .2em;text-indent:0}
+#docs{position:fixed;inset:0;background:#0009;z-index:10;display:flex;justify-content:center;align-items:flex-end}
+#docs[hidden]{display:none}
+.sheet{background:var(--paper);color:var(--ink);width:100%;max-width:560px;max-height:82%;display:flex;flex-direction:column;border-radius:16px 16px 0 0;font-family:system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+.dh{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.dh b{flex:1;font-size:16px}
+.dh button{border:0;border-radius:8px;height:34px;padding:0 12px;font-size:14px;background:var(--pop);color:#fff}
+.dh #dclose{background:none;color:var(--ink);font-size:26px;padding:0 8px}
+#dlist{overflow-y:auto;padding:6px}
+.row{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px}
+.row.cur{background:var(--bg)}
+.row .info{flex:1;min-width:0;text-align:left;background:none;border:0;color:var(--ink);padding:4px;font:inherit}
+.info .n{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.info .s{display:block;font-size:12px;color:var(--mute)}
+.row .ib{flex:none;display:grid;place-items:center;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;width:36px;height:36px}
+.empty{padding:20px;text-align:center;color:var(--mute);font-size:14px}
 </style>
 </head>
 <body>
@@ -63,6 +78,7 @@ body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.
   <span id="status" aria-live="polite">Ready</span>
   <button id="theme" aria-label="Switch to dark mode" title="Dark / light mode"></button>
   <button id="focus" aria-label="Focus view" aria-pressed="false" title="Focus view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+  <button id="docsbtn" aria-label="My documents" title="My documents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
   <button id="newdoc">New</button>
 </header>
 <div id="bar" role="toolbar" aria-label="Formatting">
@@ -128,16 +144,37 @@ body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.
   </div>
 </main>
 <footer id="count">0 words</footer>
+<div id="docs" hidden>
+  <div class="sheet" role="dialog" aria-label="Documents">
+    <div class="dh"><b>My documents</b><button id="dnew">+ New piece</button><button id="dclose" aria-label="Close">&times;</button></div>
+    <div id="dlist"></div>
+  </div>
+</div>
 <script>
 const $=s=>document.querySelector(s), ed=$('#ed'), title=$('#title'), st=$('#status'), K='afrowriter:doc';
 let t,mode='prose',goal=0;
 function words(){const n=(ed.innerText.trim().match(/\S+/g)||[]).length;$('#count').textContent=(mode==='essay'&&goal)?n+' / '+goal+' words':n+(n===1?' word':' words')}
+const LK='afrowriter:library',uid=()=>'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+let lib={cur:null,docs:{}};
+function snap(){return{t:title.value,h:ed.innerHTML,m:mode,g:goal}}
 function save(){
-  try{localStorage.setItem(K,JSON.stringify({t:title.value,h:ed.innerHTML,m:mode,g:goal,at:Date.now()}));st.textContent='Saved on this device'}
-  catch(e){st.textContent='Could not save: storage is full or blocked'}
+  try{
+    const s=snap(),o=lib.docs[lib.cur];
+    if(o){const same=o.t===s.t&&o.h===s.h&&o.m===s.m&&o.g===s.g;lib.docs[lib.cur]=Object.assign({},o,s,{at:same?o.at:Date.now()})}
+    localStorage.setItem(LK,JSON.stringify(lib));st.textContent='Saved'
+  }catch(e){st.textContent='Could not save: storage full or blocked'}
 }
+function blank(m){return{t:'',h:'',m:m||'prose',g:0,at:Date.now()}}
+function loadDoc(id){const d=lib.docs[id];lib.cur=id;title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0}
 function queue(){st.textContent='Saving...';words();clearTimeout(t);t=setTimeout(save,600)}
-try{const d=JSON.parse(localStorage.getItem(K)||'null');if(d){title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0}}catch(e){}
+try{const l=JSON.parse(localStorage.getItem(LK)||'null');if(l&&l.docs)lib=l}catch(e){}
+if(!lib.docs[lib.cur]){
+  const ids=Object.keys(lib.docs);
+  if(ids.length)lib.cur=ids.sort((a,b)=>lib.docs[b].at-lib.docs[a].at)[0];
+  else{let d=null;try{d=JSON.parse(localStorage.getItem(K)||'null')}catch(e){}
+    const id=uid();lib.docs[id]=d?Object.assign(blank(),d):blank();lib.cur=id}
+}
+loadDoc(lib.cur);
 words();
 ed.addEventListener('input',queue);title.addEventListener('input',queue);
 ed.addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'))});
@@ -150,10 +187,39 @@ $('#bar').addEventListener('click',e=>{
   if(b.dataset.a==='dbl'){P.dbl=!P.dbl;apply();return}
   ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);queue();
 });
-$('#newdoc').onclick=()=>{
-  if(!(ed.innerText.trim()||title.value))return;
-  if(confirm('Start a new document? The current one will be cleared from this device.')){title.value='';ed.innerHTML='';save();words();ed.focus()}
-};
+function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);setMode(mode,true);words();save();scrollTo(0,0);$('main').scrollTop=0}
+function newPiece(){
+  clearTimeout(t);save();
+  const c=lib.docs[lib.cur];
+  if(c&&!c.t&&!ed.innerText.trim()){closeDocs();return}
+  const id=uid();lib.docs[id]=blank(mode);openDoc(id);closeDocs();title.focus()
+}
+$('#newdoc').onclick=newPiece;
+const IC={pen:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',del:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>'};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wcount=x=>(x||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').split(/\s+/).filter(Boolean).length;
+function ago(ts){const m=Math.floor((Date.now()-ts)/6e4);if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.floor(m/60);if(h<24)return h+' h ago';const d=Math.floor(h/24);return d+(d===1?' day ago':' days ago')}
+function renderDocs(){
+  const items=Object.entries(lib.docs).sort((a,b)=>b[1].at-a[1].at);
+  $('#dlist').innerHTML=items.map(([id,d])=>'<div class="row'+(id===lib.cur?' cur':'')+'" data-id="'+id+'"><button class="info" data-o="1"><span class="n">'+esc(d.t||'Untitled')+'</span><span class="s">'+d.m[0].toUpperCase()+d.m.slice(1)+' &middot; '+wcount(d.h)+' words &middot; '+ago(d.at)+'</span></button><button class="ib" data-r="1" aria-label="Rename">'+IC.pen+'</button><button class="ib" data-x="1" aria-label="Delete">'+IC.del+'</button></div>').join('')||'<div class="empty">No pieces yet</div>';
+}
+function openDocs(){clearTimeout(t);save();renderDocs();$('#docs').hidden=false}
+function closeDocs(){$('#docs').hidden=true}
+$('#docsbtn').onclick=openDocs;$('#dclose').onclick=closeDocs;$('#dnew').onclick=newPiece;
+$('#docs').addEventListener('click',e=>{if(e.target.id==='docs')closeDocs()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDocs()});
+$('#dlist').addEventListener('click',e=>{
+  const row=e.target.closest('.row');if(!row)return;const id=row.dataset.id,d=lib.docs[id];
+  if(e.target.closest('[data-r]')){const v=prompt('Rename this piece',d.t||'');if(v!==null){d.t=v.trim();if(id===lib.cur)title.value=d.t;save();renderDocs()}return}
+  if(e.target.closest('[data-x]')){
+    if(!confirm('Delete "'+(d.t||'Untitled')+'" from this device? This cannot be undone.'))return;
+    delete lib.docs[id];
+    if(id===lib.cur){const ids=Object.keys(lib.docs).sort((a,b)=>lib.docs[b].at-lib.docs[a].at);const nid=ids[0]||uid();if(!ids.length)lib.docs[nid]=blank(mode);openDoc(nid)}
+    else save();
+    renderDocs();return
+  }
+  openDoc(id);closeDocs();
+});
 let rng=null;
 document.addEventListener('selectionchange',()=>{const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))rng=s.getRangeAt(0).cloneRange()});
 $('#styles').addEventListener('change',e=>{
