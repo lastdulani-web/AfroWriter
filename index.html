@@ -54,9 +54,9 @@ body[data-mode=essay] #ed div,body[data-mode=essay] #ed p{line-height:1.8;margin
 body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.3}
 #bar button[aria-pressed=true]{background:var(--pop);color:#fff}
 #ed .sec{font-family:system-ui,sans-serif;font-weight:700;font-size:.78em;letter-spacing:.1em;text-transform:uppercase;color:var(--pop);margin:1em 0 .2em;text-indent:0}
-#docs{position:fixed;inset:0;background:#0009;z-index:10;display:flex;justify-content:center;align-items:flex-end}
+#docs{position:fixed;inset:calc(env(safe-area-inset-top,0px) + 54px) 0 0 0;background:#0006;z-index:10;display:flex;justify-content:flex-end;align-items:flex-start}
 #docs[hidden]{display:none}
-.sheet{background:var(--paper);color:var(--ink);width:100%;max-width:560px;max-height:82%;display:flex;flex-direction:column;border-radius:16px 16px 0 0;font-family:system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+.sheet{background:var(--paper);color:var(--ink);width:100%;max-width:420px;max-height:calc(100% - 16px);margin:8px;display:flex;flex-direction:column;border-radius:14px;border:1px solid var(--line);box-shadow:0 10px 30px #0006;font-family:system-ui,sans-serif;overflow:hidden}
 .dh{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
 .dh b{flex:1;font-size:16px}
 .dh button{border:0;border-radius:8px;height:34px;padding:0 12px;font-size:14px;background:var(--pop);color:#fff}
