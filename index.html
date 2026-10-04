@@ -33,7 +33,7 @@ main{flex:1;overflow-y:auto;padding:14px 10px calc(14px + env(safe-area-inset-bo
 .page{max-width:720px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:4px;min-height:100%;padding:22px 20px}
 #title{width:100%;border:0;background:none;color:var(--ink);font-weight:700;font-size:26px;line-height:1.25;font-family:var(--ef);outline:none;padding:0 0 10px;border-bottom:3px solid var(--pop);margin-bottom:14px}
 #ed{outline:none;min-height:50vh;word-wrap:break-word;font-family:var(--ef);font-size:var(--es,17px)}
-#font,#styles,#size,#mode{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
+#font,#styles,#size,#mode,#exp{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
 #ed:empty:before{content:attr(data-ph);color:var(--mute)}
 #ed h1{font-size:1.4em;line-height:1.3;margin:1em 0 .3em}
 #ed h2{font-size:1.18em;line-height:1.3;margin:1em 0 .3em}
@@ -69,6 +69,18 @@ body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.
 .info .s{display:block;font-size:12px;color:var(--mute)}
 .row .ib{flex:none;display:grid;place-items:center;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;width:36px;height:36px}
 .empty{padding:20px;text-align:center;color:var(--mute);font-size:14px}
+@media print{
+:root,:root:not([data-theme=light]),:root[data-theme=dark],:root[data-theme=light]{--paper:#fff;--ink:#000;--mute:#444;--line:#bbb;--bg:#fff;--pop:#444}
+header,#bar,footer,#docs{display:none!important}
+html,body{height:auto;background:#fff;color:#000;padding:0}
+body{display:block}
+main{overflow:visible;padding:0}
+.page{border:0;max-width:none;padding:0;min-height:0;background:#fff}
+#title{border-bottom:1px solid #999}
+#ed{min-height:0}
+#ed .sec{color:#000}
+@page{margin:2cm}
+}
 </style>
 </head>
 <body>
@@ -136,6 +148,12 @@ body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.
   <span class="sep"></span>
   <button data-c="undo" aria-label="Undo">Undo</button>
   <button data-c="redo" aria-label="Redo">Redo</button>
+  <span class="sep"></span>
+  <select id="exp" aria-label="Export">
+    <option value="" selected disabled hidden>Export</option>
+    <option value="pdf">PDF (print)</option>
+    <option value="docx">Word (.docx)</option>
+  </select>
 </div>
 <main>
   <div class="page">
@@ -253,6 +271,89 @@ $('#mode').addEventListener('change',e=>setMode(e.target.value));
 $('#focus').addEventListener('click',e=>{const on=document.body.classList.toggle('focus');e.currentTarget.setAttribute('aria-pressed',on)});
 setMode(mode,true);
 mq.addEventListener&&mq.addEventListener('change',paintTheme);
+const enc=new TextEncoder();
+const CT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc(b){let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CT[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function zip(files){
+  const now=new Date(),dt=((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate(),tm=(now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1);
+  const parts=[],cd=[];let off=0;
+  for(const f of files){
+    const nm=enc.encode(f.name),d=enc.encode(f.data),c=crc(d);
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(10,tm,true);lh.setUint16(12,dt,true);lh.setUint32(14,c,true);lh.setUint32(18,d.length,true);lh.setUint32(22,d.length,true);lh.setUint16(26,nm.length,true);
+    parts.push(new Uint8Array(lh.buffer),nm,d);
+    const ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(12,tm,true);ch.setUint16(14,dt,true);ch.setUint32(16,c,true);ch.setUint32(20,d.length,true);ch.setUint32(24,d.length,true);ch.setUint16(28,nm.length,true);ch.setUint32(42,off,true);
+    cd.push(new Uint8Array(ch.buffer),nm);
+    off+=30+nm.length+d.length;
+  }
+  let cds=0;cd.forEach(p=>cds+=p.length);
+  const e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cds,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cd,new Uint8Array(e.buffer)],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+}
+const XE=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function wrun(text,f){
+  const rp=(f.b?'<w:b/>':'')+(f.i?'<w:i/>':'')+(f.caps?'<w:caps/>':'')+(f.color?'<w:color w:val="'+f.color+'"/>':'')+(f.sz?'<w:sz w:val="'+f.sz+'"/>':'')+(f.u?'<w:u w:val="single"/>':'');
+  return '<w:r>'+(rp?'<w:rPr>'+rp+'</w:rPr>':'')+'<w:t xml:space="preserve">'+XE(text)+'</w:t></w:r>';
+}
+function wruns(node,fmt,out){
+  node.childNodes.forEach(n=>{
+    if(n.nodeType===3){if(n.nodeValue)out.push(wrun(n.nodeValue,fmt))}
+    else if(n.nodeType===1){
+      const tg=n.tagName;
+      if(tg==='BR'){out.push('<w:r><w:br/></w:r>');return}
+      const f=Object.assign({},fmt);
+      if(tg==='B'||tg==='STRONG')f.b=1;
+      if(tg==='I'||tg==='EM')f.i=1;
+      if(tg==='U')f.u=1;
+      wruns(n,f,out)
+    }
+  })
+}
+const wpara=(inner,pp)=>'<w:p>'+(pp?'<w:pPr>'+pp+'</w:pPr>':'')+inner+'</w:p>';
+function wblock(n,f,out){if(n.childNodes.length===1&&n.childNodes[0].tagName==='BR')return;wruns(n,f,out)}
+function buildDocx(root,ttl,md,dbl,fam){
+  const sp=md==='essay'?(dbl?'<w:spacing w:after="0" w:line="480" w:lineRule="auto"/>':'<w:spacing w:after="160" w:line="360" w:lineRule="auto"/>'):md==='prose'?'<w:spacing w:after="0" w:line="360" w:lineRule="auto"/><w:ind w:firstLine="360"/>':'<w:spacing w:after="0" w:line="276" w:lineRule="auto"/>';
+  const out=[];let cur=[];
+  if(ttl)out.push(wpara(wrun(ttl,{b:1,sz:44}),'<w:spacing w:after="280"/>'));
+  const flush=()=>{if(cur.length){out.push(wpara(cur.join(''),sp));cur=[]}};
+  root.childNodes.forEach(n=>{
+    const blockTag=n.nodeType===1&&/^(DIV|P|H[1-4]|UL|OL)$/.test(n.tagName);
+    if(!blockTag){wruns({childNodes:[n]},{},cur);return}
+    flush();
+    const tg=n.tagName,r=[];
+    if(/^H[1-4]$/.test(tg)){wblock(n,{b:1,i:tg==='H4'?1:0,sz:{H1:36,H2:30,H3:26,H4:24}[tg]},r);out.push(wpara(r.join(''),'<w:keepNext/><w:spacing w:before="240" w:after="80"/>'));return}
+    if(tg==='UL'||tg==='OL'){let k=0;n.childNodes.forEach(li=>{if(li.tagName!=='LI')return;k++;const r2=[];wruns(li,{},r2);out.push(wpara(wrun(tg==='UL'?'\u2022\t':k+'.\t',{})+r2.join(''),'<w:tabs><w:tab w:val="left" w:pos="540"/></w:tabs><w:spacing w:after="40"/><w:ind w:left="540" w:hanging="360"/>'))});return}
+    if(n.classList&&n.classList.contains('sec')){wblock(n,{b:1,caps:1,color:'D93A73',sz:20},r);out.push(wpara(r.join(''),'<w:keepNext/><w:spacing w:before="240" w:after="60"/>'));return}
+    wblock(n,{},r);out.push(wpara(r.join(''),sp))
+  });
+  flush();
+  const W='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"',H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  return zip([
+    {name:'[Content_Types].xml',data:H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>'},
+    {name:'_rels/.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'},
+    {name:'word/_rels/document.xml.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+    {name:'word/styles.xml',data:H+'<w:styles '+W+'><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="'+XE(fam)+'" w:hAnsi="'+XE(fam)+'" w:cs="'+XE(fam)+'"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:rPrDefault></w:docDefaults></w:styles>'},
+    {name:'word/document.xml',data:H+'<w:document '+W+'><w:body>'+out.join('')+'<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>'}
+  ]);
+}
+
+function slug(){return(title.value.trim()||'AfroWriter').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').slice(0,60)||'AfroWriter'}
+function doDocx(){
+  clearTimeout(t);save();
+  const first=P.f.split(',')[0].replace(/['"]/g,'').trim();
+  const blob=buildDocx(ed,title.value.trim(),mode,!!P.dbl,/system-ui/.test(first)?'Calibri':first);
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=slug()+'.docx';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  st.textContent='Word file ready'
+}
+function doPdf(){
+  clearTimeout(t);save();const old=document.title;document.title=title.value.trim()||'AfroWriter';
+  const back=()=>{document.title=old;removeEventListener('afterprint',back)};
+  addEventListener('afterprint',back);setTimeout(()=>{print();setTimeout(back,3000)},50)
+}
+$('#exp').addEventListener('change',e=>{const v=e.target.value;e.target.selectedIndex=0;v==='pdf'?doPdf():doDocx()});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
