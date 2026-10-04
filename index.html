@@ -13,8 +13,8 @@
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#1a1c2e;--ink:#e9eaf5;--mute:#a0a4c4;--line:#2b2e48;--bg:#11121f}}
 :root[data-theme=dark]{--paper:#1a1c2e;--ink:#e9eaf5;--mute:#a0a4c4;--line:#2b2e48;--bg:#11121f}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
-#theme{background:none;border:1px solid #ffffff66;color:#fff;border-radius:6px;width:34px;height:28px;display:grid;place-items:center;padding:0}
-#theme svg{width:18px;height:18px}#theme:focus-visible{outline:2px solid var(--pop);outline-offset:1px}
+#theme,#focus{background:none;border:1px solid #ffffff66;color:#fff;border-radius:6px;width:34px;height:28px;display:grid;place-items:center;padding:0}
+#theme svg,#focus svg{width:18px;height:18px}#focus[aria-pressed=true]{background:var(--pop);border-color:var(--pop)}#theme:focus-visible,#focus:focus-visible{outline:2px solid var(--pop);outline-offset:1px}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,"Iowan Old Style",serif;padding-top:env(safe-area-inset-top)}
@@ -33,7 +33,7 @@ main{flex:1;overflow-y:auto;padding:14px 10px calc(14px + env(safe-area-inset-bo
 .page{max-width:720px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:4px;min-height:100%;padding:22px 20px}
 #title{width:100%;border:0;background:none;color:var(--ink);font-weight:700;font-size:26px;line-height:1.25;font-family:var(--ef);outline:none;padding:0 0 10px;border-bottom:3px solid var(--pop);margin-bottom:14px}
 #ed{outline:none;min-height:50vh;word-wrap:break-word;font-family:var(--ef);font-size:var(--es,17px)}
-#font,#styles,#size{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
+#font,#styles,#size,#mode{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
 #ed:empty:before{content:attr(data-ph);color:var(--mute)}
 #ed h1{font-size:1.4em;line-height:1.3;margin:1em 0 .3em}
 #ed h2{font-size:1.18em;line-height:1.3;margin:1em 0 .3em}
@@ -43,6 +43,17 @@ main{flex:1;overflow-y:auto;padding:14px 10px calc(14px + env(safe-area-inset-bo
 #ed ul,#ed ol{padding-left:1.4em}
 footer{font:12px system-ui,sans-serif;color:var(--mute);text-align:center;padding:6px 0 calc(6px + env(safe-area-inset-bottom));background:var(--paper);border-top:1px solid var(--line)}
 @media(prefers-reduced-motion:no-preference){#status{transition:opacity .3s}}
+body.focus #bar,body.focus footer{display:none}
+.only-lyrics,.only-essay{display:none}
+body[data-mode=lyrics] .only-lyrics,body[data-mode=essay] .only-essay{display:block}
+body[data-mode=prose] #ed div,body[data-mode=prose] #ed p{text-indent:1.5em;margin:0;line-height:1.75}
+body[data-mode=poem] #ed,body[data-mode=lyrics] #ed{white-space:pre-wrap;line-height:1.5}
+body[data-mode=poem] #ed div,body[data-mode=poem] #ed p,body[data-mode=lyrics] #ed div,body[data-mode=lyrics] #ed p{margin:0}
+body[data-mode=poem] .page{max-width:560px}
+body[data-mode=essay] #ed div,body[data-mode=essay] #ed p{line-height:1.8;margin:0 0 .9em}
+body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.3}
+#bar button[aria-pressed=true]{background:var(--pop);color:#fff}
+#ed .sec{font-family:system-ui,sans-serif;font-weight:700;font-size:.78em;letter-spacing:.1em;text-transform:uppercase;color:var(--pop);margin:1em 0 .2em;text-indent:0}
 </style>
 </head>
 <body>
@@ -51,12 +62,25 @@ footer{font:12px system-ui,sans-serif;color:var(--mute);text-align:center;paddin
   <b>Afro<i>Writer</i></b>
   <span id="status" aria-live="polite">Ready</span>
   <button id="theme" aria-label="Switch to dark mode" title="Dark / light mode"></button>
+  <button id="focus" aria-label="Focus view" aria-pressed="false" title="Focus view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
   <button id="newdoc">New</button>
 </header>
 <div id="bar" role="toolbar" aria-label="Formatting">
   <button data-c="bold" aria-label="Bold"><b>B</b></button>
   <button data-c="italic" aria-label="Italic"><i>I</i></button>
   <button data-c="underline" aria-label="Underline"><u>U</u></button>
+  <span class="sep"></span>
+  <select id="mode" aria-label="Writing mode">
+    <option value="prose">Prose</option>
+    <option value="poem">Poem</option>
+    <option value="lyrics">Lyrics</option>
+    <option value="essay">Essay</option>
+  </select>
+  <button class="only-lyrics" data-l="Verse">Verse</button>
+  <button class="only-lyrics" data-l="Chorus">Chorus</button>
+  <button class="only-lyrics" data-l="Bridge">Bridge</button>
+  <button class="only-essay" data-a="goal" aria-label="Set word goal">Goal</button>
+  <button class="only-essay" data-a="dbl" id="dbl" aria-pressed="false" aria-label="Double spacing">2&times;</button>
   <span class="sep"></span>
   <select id="styles" aria-label="Styles">
     <option value="" selected disabled hidden>Styles</option>
@@ -106,14 +130,14 @@ footer{font:12px system-ui,sans-serif;color:var(--mute);text-align:center;paddin
 <footer id="count">0 words</footer>
 <script>
 const $=s=>document.querySelector(s), ed=$('#ed'), title=$('#title'), st=$('#status'), K='afrowriter:doc';
-let t;
-function words(){const n=(ed.innerText.trim().match(/\S+/g)||[]).length;$('#count').textContent=n+(n===1?' word':' words')}
+let t,mode='prose',goal=0;
+function words(){const n=(ed.innerText.trim().match(/\S+/g)||[]).length;$('#count').textContent=(mode==='essay'&&goal)?n+' / '+goal+' words':n+(n===1?' word':' words')}
 function save(){
-  try{localStorage.setItem(K,JSON.stringify({t:title.value,h:ed.innerHTML,at:Date.now()}));st.textContent='Saved on this device'}
+  try{localStorage.setItem(K,JSON.stringify({t:title.value,h:ed.innerHTML,m:mode,g:goal,at:Date.now()}));st.textContent='Saved on this device'}
   catch(e){st.textContent='Could not save: storage is full or blocked'}
 }
 function queue(){st.textContent='Saving...';words();clearTimeout(t);t=setTimeout(save,600)}
-try{const d=JSON.parse(localStorage.getItem(K)||'null');if(d){title.value=d.t||'';ed.innerHTML=d.h||''}}catch(e){}
+try{const d=JSON.parse(localStorage.getItem(K)||'null');if(d){title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0}}catch(e){}
 words();
 ed.addEventListener('input',queue);title.addEventListener('input',queue);
 ed.addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'))});
@@ -121,6 +145,9 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeo
 $('#bar').addEventListener('mousedown',e=>{if(e.target.tagName!=='SELECT')e.preventDefault()});
 $('#bar').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.l){ed.focus();document.execCommand('insertHTML',false,'<div class="sec">'+b.dataset.l+'</div><div><br></div>');queue();return}
+  if(b.dataset.a==='goal'){const v=prompt('Word goal (0 to clear)',goal||'500');if(v!==null){goal=Math.max(0,parseInt(v)||0);words();queue()}return}
+  if(b.dataset.a==='dbl'){P.dbl=!P.dbl;apply();return}
   ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);queue();
 });
 $('#newdoc').onclick=()=>{
@@ -141,6 +168,7 @@ function apply(){
   const r=document.documentElement.style;r.setProperty('--ef',P.f);r.setProperty('--es',P.s+'px');
   if([...fs.options].some(o=>o.value===P.f))fs.value=P.f;
   if(P.theme)document.documentElement.dataset.theme=P.theme;
+  document.body.classList.toggle('dbl',!!P.dbl);const db=$('#dbl');if(db)db.setAttribute('aria-pressed',!!P.dbl);
   if(typeof paintTheme==='function')paintTheme();
   const sz=$('#size');
   if(![...sz.options].some(o=>+o.value===P.s)){const o=new Option(P.s,P.s);const nx=[...sz.options].find(x=>+x.value>P.s);sz.add(o,nx||null)}
@@ -154,6 +182,10 @@ function paintTheme(){const d=isDark();tb.innerHTML=d?ICON.sun:ICON.moon;tb.setA
 tb.addEventListener('click',()=>{P.theme=isDark()?'light':'dark';apply()});
 fs.addEventListener('change',()=>{P.f=fs.value;apply()});
 apply();
+function setMode(m,init){mode=m;document.body.dataset.mode=m;$('#mode').value=m;words();if(!init)queue()}
+$('#mode').addEventListener('change',e=>setMode(e.target.value));
+$('#focus').addEventListener('click',e=>{const on=document.body.classList.toggle('focus');e.currentTarget.setAttribute('aria-pressed',on)});
+setMode(mode,true);
 mq.addEventListener&&mq.addEventListener('change',paintTheme);
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
