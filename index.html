@@ -5,6 +5,10 @@
 <meta name="author" content="Last Dulani">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2b2a6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AfroWriter">
 <title>AfroWriter</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -18,8 +22,8 @@
 #theme svg,#focus svg,#docsbtn svg{width:18px;height:18px}#focus[aria-pressed=true]{background:var(--pop);border-color:var(--pop)}#theme:focus-visible,#focus:focus-visible,#docsbtn:focus-visible{outline:2px solid var(--pop);outline-offset:1px}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,"Iowan Old Style",serif;padding-top:env(safe-area-inset-top)}
-header{background:var(--brand);color:#fff;display:flex;align-items:center;gap:8px;padding:8px 10px;font-family:system-ui,sans-serif}
+body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,"Iowan Old Style",serif}
+header{background:var(--brand);color:#fff;display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top,0px)) 10px 8px;font-family:system-ui,sans-serif}
 header .logo{flex:none;width:38px;height:38px;border-radius:10px;display:block;object-fit:contain;background:#fcfcff}
 header b{font-size:16px;letter-spacing:.2px}
 .brand{display:flex;flex-direction:column;line-height:1.15;flex:none}
@@ -97,7 +101,34 @@ footer{display:flex;justify-content:center;align-items:center;gap:10px}
 #splash.out{opacity:0;pointer-events:none}
 @media(prefers-reduced-motion:reduce){#splash{transition:none}}
 .credit{padding:10px 14px;font-size:12px;color:var(--mute);text-align:center;border-top:1px solid var(--line)}
+@media(max-width:600px){
+#tabs:has(.tab:only-of-type){display:none}
+main{padding:0 0 calc(10px + env(safe-area-inset-bottom))}
+.page{border:0;border-radius:0;padding:16px 14px}
+#title{font-size:22px;padding-bottom:8px;margin-bottom:10px}
+#bar{flex-wrap:wrap;overflow:visible;padding:4px 6px;gap:2px 4px}
+#bar .sep{display:none}
+#bar button{height:34px;min-width:34px;padding:0 8px}
+#font,#styles,#size,#mode,#exp{height:34px;font-size:13px;padding:0 2px 0 5px}
+#mode{width:74px}#styles{width:80px}#font{width:90px}#size{width:50px}#exp{width:70px}
+#bar button{padding:0 6px;min-width:32px}
+#bar .lbl{display:none}
+}
+@media(max-width:380px){.brand small{font-size:9px}}
+#editrow{display:none}
+@media(max-width:600px){
+#editrow{display:flex;padding:4px 8px;background:var(--paper);border-bottom:1px solid var(--line);font-family:system-ui,sans-serif}
+#editbtn{display:flex;align-items:center;gap:6px;height:28px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:none;color:var(--ink);font-size:13px}
+#editbtn .chev{transition:transform .25s}
+#editbtn[aria-expanded=true]{background:var(--pop);border-color:var(--pop);color:#fff}
+#editbtn[aria-expanded=true] .chev{transform:rotate(180deg)}
+#bar{max-height:0;overflow:hidden;padding-top:0;padding-bottom:0;border-bottom:0;transition:max-height .25s ease}
+body.tb-open #bar{max-height:260px;overflow:visible;padding-top:4px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+body.focus #editrow{display:none}
+}
+@media(prefers-reduced-motion:reduce){#bar,#editbtn .chev{transition:none}}
 @media print{
+#editrow{display:none!important}
 #splash{display:none!important}
 :root,:root:not([data-theme=light]),:root[data-theme=dark],:root[data-theme=light]{--paper:#fff;--ink:#000;--mute:#444;--line:#bbb;--bg:#fff;--pop:#444}
 header,#bar,#tabs,footer,#docs{display:none!important}
@@ -123,6 +154,7 @@ main{overflow:visible;padding:0}
   <button id="newdoc">New</button>
 </header>
 <div id="tabs" role="tablist" aria-label="Open pieces"></div>
+<div id="editrow"><button id="editbtn" aria-expanded="false" aria-controls="bar"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span>Edit</span><svg class="chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
 <div id="bar" role="toolbar" aria-label="Formatting">
   <button data-c="bold" aria-label="Bold"><b>B</b></button>
   <button data-c="italic" aria-label="Italic"><i>I</i></button>
@@ -149,8 +181,8 @@ main{overflow:visible;padding:0}
     <option value="h4">Heading 4</option>
   </select>
   <span class="sep"></span>
-  <button data-c="insertUnorderedList" aria-label="Bulleted list">&bull; List</button>
-  <button data-c="insertOrderedList" aria-label="Numbered list">1. List</button>
+  <button data-c="insertUnorderedList" aria-label="Bulleted list">&bull;<span class="lbl"> List</span></button>
+  <button data-c="insertOrderedList" aria-label="Numbered list">1.<span class="lbl"> List</span></button>
   <span class="sep"></span>
   <select id="font" aria-label="Font">
     <option value="Georgia,'Iowan Old Style',serif">Serif</option>
@@ -413,6 +445,13 @@ $('#exp').addEventListener('change',e=>{const v=e.target.value;e.target.selected
 const sp=$('#splash');
 function hideSplash(){sp.classList.add('out');setTimeout(()=>sp.remove(),500)}
 try{if(sessionStorage.getItem('afrowriter:splash'))sp.remove();else{sessionStorage.setItem('afrowriter:splash','1');setTimeout(hideSplash,1600);sp.onclick=hideSplash}}catch(e){setTimeout(hideSplash,1600)}
+const ebtn=$('#editbtn');
+function setBar(o){document.body.classList.toggle('tb-open',o);ebtn.setAttribute('aria-expanded',o)}
+ebtn.addEventListener('mousedown',e=>e.preventDefault());
+ebtn.onclick=()=>setBar(!document.body.classList.contains('tb-open'));
+const TYPING=new Set(['insertText','insertCompositionText','insertLineBreak','insertParagraph','insertFromPaste','deleteContentBackward','deleteContentForward','deleteWordBackward']);
+ed.addEventListener('beforeinput',e=>{if(TYPING.has(e.inputType)&&document.body.classList.contains('tb-open'))setBar(false)});
+title.addEventListener('input',()=>{if(document.body.classList.contains('tb-open'))setBar(false)});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
