@@ -41,7 +41,7 @@ main{flex:1;overflow-y:auto;padding:14px 10px calc(14px + env(safe-area-inset-bo
 .page{max-width:720px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:4px;min-height:100%;padding:22px 20px}
 #title{width:100%;border:0;background:none;color:var(--ink);font-weight:700;font-size:26px;line-height:1.25;font-family:var(--ef);outline:none;padding:0 0 10px;border-bottom:3px solid var(--pop);margin-bottom:14px}
 #ed{outline:none;min-height:50vh;word-wrap:break-word;font-family:var(--ef);font-size:var(--es,17px)}
-#font,#styles,#size,#mode,#exp{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
+#font,#styles,#size,#mode,#exp,#list,#case{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
 #ed:empty:before{content:attr(data-ph);color:var(--mute)}
 #ed h1{font-size:1.4em;line-height:1.3;margin:1em 0 .3em}
 #ed h2{font-size:1.18em;line-height:1.3;margin:1em 0 .3em}
@@ -101,6 +101,20 @@ footer{display:flex;justify-content:center;align-items:center;gap:10px}
 #splash.out{opacity:0;pointer-events:none}
 @media(prefers-reduced-motion:reduce){#splash{transition:none}}
 .credit{padding:10px 14px;font-size:12px;color:var(--mute);text-align:center;border-top:1px solid var(--line)}
+.lab{flex:none;display:flex;align-items:center;gap:2px;height:38px;border:1px solid var(--line);border-radius:8px;padding-left:9px;font:12px system-ui,sans-serif;color:var(--mute)}
+.lab #mode{border:0;background:none;height:100%;font-weight:600}
+#bar svg{display:block}
+#picker{position:fixed;inset:0;z-index:15;background:#0009;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,sans-serif}
+#picker[hidden]{display:none}
+.pk{background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:100%;max-width:440px;padding:16px;max-height:100%;overflow-y:auto}
+.pkh{display:flex;align-items:center;margin-bottom:12px}
+.pkh b{flex:1;font-size:18px}
+.pkh button{border:0;background:none;color:var(--ink);font-size:28px;line-height:1;padding:0 6px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;text-align:left;border:1px solid var(--line);border-top:3px solid var(--pop);background:var(--bg);color:var(--ink);border-radius:12px;padding:12px;min-height:116px;font:inherit}
+.card b{display:block;font-size:16px;margin-bottom:6px}
+.card span{display:block;font-size:12.5px;line-height:1.4;color:var(--mute)}
+.card:active{border-color:var(--pop)}
 @media(max-width:600px){
 #tabs:has(.tab:only-of-type){display:none}
 main{padding:0 0 calc(10px + env(safe-area-inset-bottom))}
@@ -109,8 +123,10 @@ main{padding:0 0 calc(10px + env(safe-area-inset-bottom))}
 #bar{flex-wrap:wrap;overflow:visible;padding:4px 6px;gap:2px 4px}
 #bar .sep{display:none}
 #bar button{height:34px;min-width:34px;padding:0 8px}
-#font,#styles,#size,#mode,#exp{height:34px;font-size:13px;padding:0 2px 0 5px}
-#mode{width:74px}#styles{width:80px}#font{width:90px}#size{width:50px}#exp{width:70px}
+#font,#styles,#size,#mode,#exp,#list,#case{height:34px;font-size:13px;padding:0 2px 0 5px}
+#mode{width:78px}#styles{width:80px}#list{width:58px}#font{width:90px}#size{width:50px}#case{width:52px}#exp{width:70px}
+.lab{height:34px}
+#bar button{min-width:36px}
 #bar button{padding:0 6px;min-width:32px}
 #bar .lbl{display:none}
 }
@@ -128,7 +144,7 @@ body.focus #editrow{display:none}
 }
 @media(prefers-reduced-motion:reduce){#bar,#editbtn .chev{transition:none}}
 @media print{
-#editrow{display:none!important}
+#editrow,#picker{display:none!important}
 #splash{display:none!important}
 :root,:root:not([data-theme=light]),:root[data-theme=dark],:root[data-theme=light]{--paper:#fff;--ink:#000;--mute:#444;--line:#bbb;--bg:#fff;--pop:#444}
 header,#bar,#tabs,footer,#docs{display:none!important}
@@ -156,16 +172,12 @@ main{overflow:visible;padding:0}
 <div id="tabs" role="tablist" aria-label="Open pieces"></div>
 <div id="editrow"><button id="editbtn" aria-expanded="false" aria-controls="bar"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span>Edit</span><svg class="chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
 <div id="bar" role="toolbar" aria-label="Formatting">
-  <button data-c="bold" aria-label="Bold"><b>B</b></button>
-  <button data-c="italic" aria-label="Italic"><i>I</i></button>
-  <button data-c="underline" aria-label="Underline"><u>U</u></button>
-  <span class="sep"></span>
-  <select id="mode" aria-label="Writing mode">
+  <label class="lab"><span>Mode</span><select id="mode" aria-label="Writing mode">
     <option value="prose">Prose</option>
     <option value="poem">Poem</option>
     <option value="lyrics">Lyrics</option>
     <option value="essay">Essay</option>
-  </select>
+  </select></label>
   <button class="only-lyrics" data-l="Verse">Verse</button>
   <button class="only-lyrics" data-l="Chorus">Chorus</button>
   <button class="only-lyrics" data-l="Bridge">Bridge</button>
@@ -180,10 +192,15 @@ main{overflow:visible;padding:0}
     <option value="h3">Heading 3</option>
     <option value="h4">Heading 4</option>
   </select>
+  <select id="list" aria-label="List">
+    <option value="" selected disabled hidden>List</option>
+    <option value="insertUnorderedList">Bulleted list</option>
+    <option value="insertOrderedList">Numbered list</option>
+  </select>
   <span class="sep"></span>
-  <button data-c="insertUnorderedList" aria-label="Bulleted list">&bull;<span class="lbl"> List</span></button>
-  <button data-c="insertOrderedList" aria-label="Numbered list">1.<span class="lbl"> List</span></button>
-  <span class="sep"></span>
+  <button data-c="bold" aria-label="Bold"><b>B</b></button>
+  <button data-c="italic" aria-label="Italic"><i>I</i></button>
+  <button data-c="underline" aria-label="Underline"><u>U</u></button>
   <select id="font" aria-label="Font">
     <option value="Georgia,'Iowan Old Style',serif">Serif</option>
     <option value="'Times New Roman',Times,serif">Classic</option>
@@ -207,9 +224,15 @@ main{overflow:visible;padding:0}
     <option value="32">32</option>
     <option value="36">36</option>
   </select>
+  <select id="case" aria-label="Change case">
+    <option value="" selected disabled hidden>Aa</option>
+    <option value="up">UPPERCASE</option>
+    <option value="lo">lowercase</option>
+    <option value="cap">Capitalise Each Word</option>
+  </select>
   <span class="sep"></span>
-  <button data-c="undo" aria-label="Undo">Undo</button>
-  <button data-c="redo" aria-label="Redo">Redo</button>
+  <button data-c="undo" aria-label="Undo"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+  <button data-c="redo" aria-label="Redo"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
   <span class="sep"></span>
   <select id="exp" aria-label="Export">
     <option value="" selected disabled hidden>Export</option>
@@ -224,6 +247,17 @@ main{overflow:visible;padding:0}
   </div>
 </main>
 <footer><button id="state" aria-label="Draft. Tap to mark as finished">Draft</button><span id="count">0 words</span></footer>
+<div id="picker" hidden>
+  <div class="pk" role="dialog" aria-label="What are you writing?">
+    <div class="pkh"><b>What are you writing?</b><button id="pkclose" aria-label="Close">&times;</button></div>
+    <div class="cards">
+      <button class="card" data-m="prose"><b>Prose</b><span>Stories, chapters and long-form writing, laid out like a book page.</span></button>
+      <button class="card" data-m="poem"><b>Poem</b><span>Keeps every line break exactly as you type it.</span></button>
+      <button class="card" data-m="lyrics"><b>Lyrics</b><span>Songs, with Verse, Chorus and Bridge labels.</span></button>
+      <button class="card" data-m="essay"><b>Essay</b><span>Structured writing with a word goal and double spacing.</span></button>
+    </div>
+  </div>
+</div>
 <div id="splash" aria-hidden="true"><img src="logo-badge.png" alt="" width="96" height="96"><b>Afro<i>Writer</i></b><span>Developed by Last Dulani</span></div>
 <div id="docs" hidden>
   <div class="sheet" role="dialog" aria-label="Documents">
@@ -250,6 +284,7 @@ function save(){
 function blank(m){return{t:'',h:'',m:m||'prose',g:0,s:'draft',at:Date.now()}}
 function loadDoc(id){const d=lib.docs[id];lib.cur=id;title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0;dstate=d.s||'draft'}
 function queue(){st.textContent='Saving...';words();updTab();clearTimeout(t);t=setTimeout(save,600)}
+let firstRun=false;try{firstRun=!localStorage.getItem(LK)&&!localStorage.getItem(K)}catch(e){}
 try{const l=JSON.parse(localStorage.getItem(LK)||'null');if(l&&l.docs)lib=l}catch(e){}
 if(!lib.docs[lib.cur]){
   const ids=Object.keys(lib.docs);
@@ -272,11 +307,13 @@ $('#bar').addEventListener('click',e=>{
   ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);queue();
 });
 function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);if(!lib.open.includes(id))lib.open.push(id);setMode(mode,true);words();save();renderTabs();paintState();scrollTo(0,0);$('main').scrollTop=0}
-function newPiece(){
+function newPiece(){closeDocs();$('#picker').hidden=false}
+function makePiece(m){
   clearTimeout(t);save();
   const c=lib.docs[lib.cur];
-  if(c&&!c.t&&!ed.innerText.trim()){closeDocs();return}
-  const id=uid();lib.docs[id]=blank(mode);openDoc(id);closeDocs();title.focus()
+  if(c&&!c.t&&!ed.innerText.trim())setMode(m);
+  else{const id=uid();lib.docs[id]=blank(m);openDoc(id)}
+  $('#picker').hidden=true;title.focus()
 }
 $('#newdoc').onclick=newPiece;
 const IC={pen:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',del:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>'};
@@ -313,7 +350,7 @@ function openDocs(){clearTimeout(t);save();renderDocs();$('#docs').hidden=false}
 function closeDocs(){$('#docs').hidden=true}
 $('#docsbtn').onclick=openDocs;$('#dclose').onclick=closeDocs;$('#dnew').onclick=newPiece;
 $('#docs').addEventListener('click',e=>{if(e.target.id==='docs')closeDocs()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDocs()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDocs();$('#picker').hidden=true}});
 $('#dlist').addEventListener('click',e=>{
   const row=e.target.closest('.row');if(!row)return;const id=row.dataset.id,d=lib.docs[id];
   if(e.target.closest('[data-r]')){const v=prompt('Rename this piece',d.t||'');if(v!==null){d.t=v.trim();if(id===lib.cur)title.value=d.t;save();renderDocs();renderTabs()}return}
@@ -357,7 +394,7 @@ apply();
 function setMode(m,init){mode=m;document.body.dataset.mode=m;$('#mode').value=m;words();if(!init)queue()}
 $('#mode').addEventListener('change',e=>setMode(e.target.value));
 $('#focus').addEventListener('click',e=>{const on=document.body.classList.toggle('focus');e.currentTarget.setAttribute('aria-pressed',on)});
-setMode(mode,true);renderTabs();paintState();
+setMode(mode,true);renderTabs();paintState();if(firstRun)$('#picker').hidden=false;
 mq.addEventListener&&mq.addEventListener('change',paintTheme);
 const enc=new TextEncoder();
 const CT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
@@ -445,6 +482,32 @@ $('#exp').addEventListener('change',e=>{const v=e.target.value;e.target.selected
 const sp=$('#splash');
 function hideSplash(){sp.classList.add('out');setTimeout(()=>sp.remove(),500)}
 try{if(sessionStorage.getItem('afrowriter:splash'))sp.remove();else{sessionStorage.setItem('afrowriter:splash','1');setTimeout(hideSplash,1600);sp.onclick=hideSplash}}catch(e){setTimeout(hideSplash,1600)}
+$('#picker').addEventListener('click',e=>{
+  if(e.target.id==='picker'||e.target.closest('#pkclose')){$('#picker').hidden=true;return}
+  const c=e.target.closest('.card');if(c)makePiece(c.dataset.m);
+});
+function restoreSel(){ed.focus();if(rng){const s=getSelection();s.removeAllRanges();s.addRange(rng)}}
+$('#list').addEventListener('change',e=>{const s=e.target;restoreSel();document.execCommand(s.value,false,null);s.selectedIndex=0;queue()});
+$('#case').addEventListener('change',e=>{const s=e.target,kind=s.value;s.selectedIndex=0;restoreSel();
+  const sel=getSelection();
+  if(!sel.rangeCount||sel.isCollapsed||!ed.contains(sel.anchorNode)){st.textContent='Select some text first';return}
+  const r=sel.getRangeAt(0).cloneRange(),cn=r.commonAncestorContainer,root=cn.nodeType===3?cn.parentNode:cn;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),segs=[];
+  for(let n=w.nextNode();n;n=w.nextNode()){
+    if(!r.intersectsNode(n))continue;
+    const a=n===r.startContainer?r.startOffset:0,b=n===r.endContainer?r.endOffset:n.nodeValue.length;
+    if(b>a)segs.push([n,a,b]);
+  }
+  const cap=x=>x.replace(/(^|[\s(\[\u201C"\-])(\p{L})/gu,(m,p,c)=>p+c.toUpperCase());
+  for(let k=segs.length-1;k>=0;k--){
+    const [n,a,b]=segs[k],full=n.nodeValue,old=full.slice(a,b);
+    const nw=kind==='up'?old.toUpperCase():kind==='lo'?old.toLowerCase():cap(full).slice(a,b);
+    if(nw===old)continue;
+    const rr=document.createRange();rr.setStart(n,a);rr.setEnd(n,b);sel.removeAllRanges();sel.addRange(rr);
+    document.execCommand('insertText',false,nw);
+  }
+  queue();
+});
 const ebtn=$('#editbtn');
 function setBar(o){document.body.classList.toggle('tb-open',o);ebtn.setAttribute('aria-expanded',o)}
 ebtn.addEventListener('mousedown',e=>e.preventDefault());
