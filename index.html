@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="author" content="Last Dulani">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2b2a6b">
 <title>AfroWriter</title>
@@ -13,14 +14,17 @@
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#1a1c2e;--ink:#e9eaf5;--mute:#a0a4c4;--line:#2b2e48;--bg:#11121f}}
 :root[data-theme=dark]{--paper:#1a1c2e;--ink:#e9eaf5;--mute:#a0a4c4;--line:#2b2e48;--bg:#11121f}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
-#theme,#focus,#docsbtn{background:none;border:1px solid #ffffff66;color:#fff;border-radius:6px;width:34px;height:28px;display:grid;place-items:center;padding:0}
+#theme,#focus,#docsbtn{background:none;border:1px solid #ffffff66;color:#fff;border-radius:6px;width:32px;height:28px;display:grid;place-items:center;padding:0}
 #theme svg,#focus svg,#docsbtn svg{width:18px;height:18px}#focus[aria-pressed=true]{background:var(--pop);border-color:var(--pop)}#theme:focus-visible,#focus:focus-visible,#docsbtn:focus-visible{outline:2px solid var(--pop);outline-offset:1px}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,"Iowan Old Style",serif;padding-top:env(safe-area-inset-top)}
-header{background:var(--brand);color:#fff;display:flex;align-items:center;gap:10px;padding:8px 12px;font-family:system-ui,sans-serif}
+header{background:var(--brand);color:#fff;display:flex;align-items:center;gap:8px;padding:8px 10px;font-family:system-ui,sans-serif}
 header .logo{flex:none;width:38px;height:38px;border-radius:10px;display:block;object-fit:contain;background:#fcfcff}
 header b{font-size:16px;letter-spacing:.2px}
+.brand{display:flex;flex-direction:column;line-height:1.15;flex:none}
+.brand small{font-size:10px;color:#fff;font-weight:400;letter-spacing:.2px;white-space:nowrap}
+@media(max-width:400px){#status{display:none}}
 header b i{color:#ff9bbd;font-style:normal}
 #status{margin-left:auto;font-size:12px;opacity:.85;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #newdoc{background:none;border:1px solid #ffffff66;color:#fff;border-radius:6px;padding:4px 10px;font:13px system-ui}
@@ -85,7 +89,16 @@ footer{display:flex;justify-content:center;align-items:center;gap:10px}
 .flt{display:flex;gap:6px;padding:8px 14px 2px}
 .flt button{border:1px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:3px 12px;font-size:13px}
 .flt button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+#splash{position:fixed;inset:0;z-index:20;background:var(--brand);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:system-ui,sans-serif;transition:opacity .4s}
+#splash img{border-radius:22px}
+#splash b{font-size:26px;letter-spacing:.2px}
+#splash i{color:#ff9bbd;font-style:normal}
+#splash span{font-size:14px;opacity:.85}
+#splash.out{opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:reduce){#splash{transition:none}}
+.credit{padding:10px 14px;font-size:12px;color:var(--mute);text-align:center;border-top:1px solid var(--line)}
 @media print{
+#splash{display:none!important}
 :root,:root:not([data-theme=light]),:root[data-theme=dark],:root[data-theme=light]{--paper:#fff;--ink:#000;--mute:#444;--line:#bbb;--bg:#fff;--pop:#444}
 header,#bar,#tabs,footer,#docs{display:none!important}
 html,body{height:auto;background:#fff;color:#000;padding:0}
@@ -102,7 +115,7 @@ main{overflow:visible;padding:0}
 <body>
 <header>
   <img src="logo-badge.png" alt="AfroWriter logo" class="logo" width="38" height="38">
-  <b>Afro<i>Writer</i></b>
+  <div class="brand"><b>Afro<i>Writer</i></b><small>Developed by Last Dulani</small></div>
   <span id="status" aria-live="polite">Ready</span>
   <button id="theme" aria-label="Switch to dark mode" title="Dark / light mode"></button>
   <button id="focus" aria-label="Focus view" aria-pressed="false" title="Focus view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -179,11 +192,13 @@ main{overflow:visible;padding:0}
   </div>
 </main>
 <footer><button id="state" aria-label="Draft. Tap to mark as finished">Draft</button><span id="count">0 words</span></footer>
+<div id="splash" aria-hidden="true"><img src="logo-badge.png" alt="" width="96" height="96"><b>Afro<i>Writer</i></b><span>Developed by Last Dulani</span></div>
 <div id="docs" hidden>
   <div class="sheet" role="dialog" aria-label="Documents">
     <div class="dh"><b>My documents</b><button id="dnew">+ New piece</button><button id="dclose" aria-label="Close">&times;</button></div>
     <div class="flt"><button data-f="all" class="on">All</button><button data-f="draft">Drafts</button><button data-f="final">Finished</button></div>
     <div id="dlist"></div>
+    <div class="credit">AfroWriter &middot; Developed by Last Dulani</div>
   </div>
 </div>
 <script>
@@ -395,6 +410,9 @@ function doPdf(){
   addEventListener('afterprint',back);setTimeout(()=>{print();setTimeout(back,3000)},50)
 }
 $('#exp').addEventListener('change',e=>{const v=e.target.value;e.target.selectedIndex=0;v==='pdf'?doPdf():doDocx()});
+const sp=$('#splash');
+function hideSplash(){sp.classList.add('out');setTimeout(()=>sp.remove(),500)}
+try{if(sessionStorage.getItem('afrowriter:splash'))sp.remove();else{sessionStorage.setItem('afrowriter:splash','1');setTimeout(hideSplash,1600);sp.onclick=hideSplash}}catch(e){setTimeout(hideSplash,1600)}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
