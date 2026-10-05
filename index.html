@@ -41,7 +41,7 @@ main{flex:1;overflow-y:auto;padding:14px 10px calc(14px + env(safe-area-inset-bo
 .page{max-width:720px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:4px;min-height:100%;padding:22px 20px}
 #title{width:100%;border:0;background:none;color:var(--ink);font-weight:700;font-size:26px;line-height:1.25;font-family:var(--ef);outline:none;padding:0 0 10px;border-bottom:3px solid var(--pop);margin-bottom:14px}
 #ed{outline:none;min-height:50vh;word-wrap:break-word;font-family:var(--ef);font-size:var(--es,17px)}
-#font,#styles,#size,#mode,#exp,#list,#case{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
+#font,#styles,#size,#mode,#exp,#list,#case,#sec,#mood{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
 #ed:empty:before{content:attr(data-ph);color:var(--mute)}
 #ed h1{font-size:1.4em;line-height:1.3;margin:1em 0 .3em}
 #ed h2{font-size:1.18em;line-height:1.3;margin:1em 0 .3em}
@@ -62,13 +62,13 @@ body[data-mode=essay] #ed div,body[data-mode=essay] #ed p{line-height:1.8;margin
 body.dbl[data-mode=essay] #ed div,body.dbl[data-mode=essay] #ed p{line-height:2.3}
 #bar button[aria-pressed=true]{background:var(--pop);color:#fff}
 #ed .sec{font-family:system-ui,sans-serif;font-weight:700;font-size:.78em;letter-spacing:.1em;text-transform:uppercase;color:var(--pop);margin:1em 0 .2em;text-indent:0}
-#docs{position:fixed;inset:calc(env(safe-area-inset-top,0px) + 54px) 0 0 0;background:#0006;z-index:10;display:flex;justify-content:flex-end;align-items:flex-start}
-#docs[hidden]{display:none}
+#docs,#side{position:fixed;inset:calc(env(safe-area-inset-top,0px) + 54px) 0 0 0;background:#0006;z-index:10;display:flex;justify-content:flex-end;align-items:flex-start}
+#docs[hidden],#side[hidden]{display:none}
 .sheet{background:var(--paper);color:var(--ink);width:100%;max-width:420px;max-height:calc(100% - 16px);margin:8px;display:flex;flex-direction:column;border-radius:14px;border:1px solid var(--line);box-shadow:0 10px 30px #0006;font-family:system-ui,sans-serif;overflow:hidden}
 .dh{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
 .dh b{flex:1;font-size:16px}
 .dh button{border:0;border-radius:8px;height:34px;padding:0 12px;font-size:14px;background:var(--pop);color:#fff}
-.dh #dclose{background:none;color:var(--ink);font-size:26px;padding:0 8px}
+.dh #dclose,.dh #sideclose{background:none;color:var(--ink);font-size:26px;padding:0 8px}
 #dlist{overflow-y:auto;padding:6px}
 .row{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px}
 .row.cur{background:var(--bg)}
@@ -116,6 +116,44 @@ select option{background:var(--paper);color:var(--ink)}
 .card b{display:block;font-size:16px;margin-bottom:6px}
 .card span{display:block;font-size:12.5px;line-height:1.4;color:var(--mute)}
 .card:active{border-color:var(--pop)}
+[data-for]{display:none}
+body[data-mode=prose] [data-for~=prose],body[data-mode=poem] [data-for~=poem],body[data-mode=lyrics] [data-for~=lyrics],body[data-mode=essay] [data-for~=essay],body[data-mode=journal] [data-for~=journal]{display:block}
+#saved{display:flex;align-items:center;gap:5px}
+#dot{width:7px;height:7px;border-radius:50%;background:#3fb68b;display:inline-block}
+#dot.busy{background:var(--pop)}#dot.bad{background:#d33}
+footer{flex-wrap:wrap;row-gap:2px}
+.card.wide{grid-column:1/-1;min-height:0}
+#findbar{display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px;background:var(--paper);border-bottom:1px solid var(--line);font-family:system-ui,sans-serif}
+#findbar[hidden]{display:none}
+#findbar input{flex:1 1 120px;min-width:0;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:0 8px;font-size:14px}
+#findbar button{height:34px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--ink);padding:0 10px;font-size:13px}
+body.focus #findbar{display:none}
+#thesis{margin:0 0 14px;border:1px dashed var(--line);border-radius:8px;padding:6px 10px;font-family:system-ui,sans-serif}
+#thesis summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
+#thesisbox{width:100%;margin-top:6px;border:0;background:none;color:var(--ink);font:15px/1.5 Georgia,serif;resize:vertical;outline:none}
+body[data-mode=prose] .page{padding-left:clamp(20px,6vw,56px)}
+#ed .sb{text-align:center;text-indent:0;color:var(--mute);letter-spacing:.4em;margin:1em 0}
+#ed .jd{font-family:system-ui,sans-serif;font-weight:700;color:var(--ink);border-left:4px solid var(--pop);padding-left:8px;margin:1.2em 0 .4em;text-indent:0}
+body.pc[data-mode=poem] #ed{text-align:center}
+#ed .ref{padding-left:2em;text-indent:-2em;margin:0 0 .5em}
+#sidebody{overflow-y:auto;padding:8px 12px 12px;font-family:system-ui,sans-serif;font-size:14px}
+.sl{display:flex;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line)}
+.sl b{min-width:28px;text-align:right;color:var(--pop)}
+.sl span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sh{margin:10px 0 2px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.note{font-size:12px;color:var(--mute);margin-top:8px}
+.seg{display:flex;gap:6px;margin-bottom:8px}
+.seg button,.rb{border:1px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:5px 12px;font-size:13px}
+.seg button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.rb{border-radius:8px;background:var(--pop);border-color:var(--pop);color:#fff;height:36px;margin-top:4px}
+.rb.ghost{background:none;color:var(--ink);border-color:var(--line);width:100%}
+.rf input,.rf select{width:100%;height:36px;margin:3px 0;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:0 8px;font-size:14px}
+.rr{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rr span{flex:1;min-width:0}
+.rr button{border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;height:30px;padding:0 10px}
+.tocr{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:8px 4px;border-bottom:1px solid var(--line);font:inherit}
+.tocr.l2{padding-left:18px}.tocr.l3{padding-left:32px}.tocr.l4{padding-left:46px}
+.tocr.l1{font-weight:700}
 @media(max-width:600px){
 #tabs:has(.tab:only-of-type){display:none}
 main{padding:0 0 calc(10px + env(safe-area-inset-bottom))}
@@ -124,8 +162,8 @@ main{padding:0 0 calc(10px + env(safe-area-inset-bottom))}
 #bar{flex-wrap:wrap;overflow:visible;padding:4px 6px;gap:2px 4px}
 #bar .sep{display:none}
 #bar button{height:34px;min-width:34px;padding:0 8px}
-#font,#styles,#size,#mode,#exp,#list,#case{height:34px;font-size:13px;padding:0 2px 0 5px}
-#mode{width:78px}#styles{width:80px}#list{width:58px}#font{width:90px}#size{width:50px}#case{width:52px}#exp{width:70px}
+#font,#styles,#size,#mode,#exp,#list,#case,#sec,#mood{height:34px;font-size:13px;padding:0 2px 0 5px}
+#sec{width:84px}#mood{width:72px}#mode{width:78px}#styles{width:80px}#list{width:58px}#font{width:90px}#size{width:50px}#case{width:52px}#exp{width:70px}
 .lab{height:34px}
 #bar button{min-width:36px}
 #bar button{padding:0 6px;min-width:32px}
@@ -145,7 +183,7 @@ body.focus #editrow{display:none}
 }
 @media(prefers-reduced-motion:reduce){#bar,#editbtn .chev{transition:none}}
 @media print{
-#editrow,#picker{display:none!important}
+#editrow,#picker,#thesis,#findbar,#side{display:none!important}
 #splash{display:none!important}
 :root,:root:not([data-theme=light]),:root[data-theme=dark],:root[data-theme=light]{--paper:#fff;--ink:#000;--mute:#444;--line:#bbb;--bg:#fff;--pop:#444}
 header,#bar,#tabs,footer,#docs{display:none!important}
@@ -171,19 +209,27 @@ main{overflow:visible;padding:0}
   <button id="newdoc">New</button>
 </header>
 <div id="tabs" role="tablist" aria-label="Open pieces"></div>
-<div id="editrow"><button id="editbtn" aria-expanded="false" aria-controls="bar"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span>Edit</span><svg class="chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
+<div id="editrow"><button id="editbtn" aria-label="Format" aria-expanded="false" aria-controls="bar"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span>Format</span><svg class="chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
 <div id="bar" role="toolbar" aria-label="Formatting">
   <label class="lab"><span>MODE</span><select id="mode" aria-label="Writing mode">
     <option value="prose">Prose</option>
     <option value="poem">Poem</option>
     <option value="lyrics">Lyrics</option>
     <option value="essay">Essay</option>
+    <option value="journal">Journal</option>
   </select></label>
-  <button class="only-lyrics" data-l="Verse">Verse</button>
-  <button class="only-lyrics" data-l="Chorus">Chorus</button>
-  <button class="only-lyrics" data-l="Bridge">Bridge</button>
-  <button class="only-essay" data-a="goal" aria-label="Set word goal">Goal</button>
-  <button class="only-essay" data-a="dbl" id="dbl" aria-pressed="false" aria-label="Double spacing">2&times;</button>
+  <button data-for="prose" data-a="auto" id="auto" aria-pressed="true" aria-label="Auto-correct">Auto</button>
+  <button data-for="prose" data-ins="sb" aria-label="Scene break">* * *</button>
+  <button data-for="prose essay" data-a="toc">Contents</button>
+  <button data-for="poem" data-a="center" id="ctr" aria-pressed="false">Center</button>
+  <button data-for="poem lyrics" data-a="syl">Syllables</button>
+  <select data-for="lyrics" id="sec" aria-label="Insert section"><option value="" selected disabled hidden>Section</option><option>Verse</option><option>Pre-Chorus</option><option>Chorus</option><option>Bridge</option><option>Hook</option><option>Outro</option><option>Instrumental Break</option></select>
+  <button data-for="essay" data-a="goal" aria-label="Set word goal">Goal</button>
+  <button data-for="essay" data-a="dbl" id="dbl" aria-pressed="false" aria-label="Double spacing">2&times;</button>
+  <button data-for="essay" data-a="refs">References</button>
+  <button data-for="journal" data-a="today">Today</button>
+  <select data-for="journal" id="mood" aria-label="Mood"><option value="" selected disabled hidden>Mood</option><option value="&#128522;">&#128522; Happy</option><option value="&#128578;">&#128578; Good</option><option value="&#128528;">&#128528; Okay</option><option value="&#128577;">&#128577; Low</option><option value="&#128546;">&#128546; Sad</option></select>
+  <button data-for="journal" data-a="entries">Entries</button>
   <span class="sep"></span>
   <select id="styles" aria-label="Styles">
     <option value="" selected disabled hidden>Styles</option>
@@ -234,6 +280,7 @@ main{overflow:visible;padding:0}
   <span class="sep"></span>
   <button data-c="undo" aria-label="Undo"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
   <button data-c="redo" aria-label="Redo"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+  <button data-a="find" aria-label="Find and replace"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg></button>
   <span class="sep"></span>
   <select id="exp" aria-label="Export">
     <option value="" selected disabled hidden>Export</option>
@@ -241,13 +288,15 @@ main{overflow:visible;padding:0}
     <option value="docx">Word (.docx)</option>
   </select>
 </div>
+<div id="findbar" hidden><input id="fq" placeholder="Find" aria-label="Find"><input id="fr" placeholder="Replace with" aria-label="Replace with"><button data-f="next">Next</button><button data-f="rep">Replace</button><button data-f="all">All</button><button data-f="x" aria-label="Close">&times;</button></div>
 <main>
   <div class="page">
+    <details id="thesis" data-for="essay"><summary>Thesis &amp; outline</summary><textarea id="thesisbox" rows="4" placeholder="Pin your thesis and main points here. They stay with this essay but are not part of the text."></textarea></details>
     <input id="title" placeholder="Untitled" aria-label="Title" autocomplete="off">
     <div id="ed" contenteditable="true" data-ph="Start writing here. Everything saves on your device." spellcheck="true"></div>
   </div>
 </main>
-<footer><button id="state" aria-label="Draft. Tap to mark as finished">Draft</button><span id="count">0 words</span></footer>
+<footer><button id="state" aria-label="Draft. Tap to mark as finished">Draft</button><span id="saved"><i id="dot"></i><span id="fstat">Saved</span></span><span id="count">0 words</span></footer>
 <div id="picker" hidden>
   <div class="pk" role="dialog" aria-label="What are you writing?">
     <div class="pkh"><b>What are you writing?</b><button id="pkclose" aria-label="Close">&times;</button></div>
@@ -256,34 +305,45 @@ main{overflow:visible;padding:0}
       <button class="card" data-m="poem"><b>Poem</b><span>Keeps every line break exactly as you type it.</span></button>
       <button class="card" data-m="lyrics"><b>Lyrics</b><span>Songs, with Verse, Chorus and Bridge labels.</span></button>
       <button class="card" data-m="essay"><b>Essay</b><span>Structured writing with a word goal and double spacing.</span></button>
+      <button class="card wide" data-m="journal"><b>Journal</b><span>Daily entries with the date added for you, plus a mood tag.</span></button>
     </div>
   </div>
 </div>
+<div id="side" hidden><div class="sheet" role="dialog"><div class="dh"><b id="sidetitle"></b><button id="sideclose" aria-label="Close">&times;</button></div><div id="sidebody"></div></div></div>
 <div id="splash" aria-hidden="true"><img src="logo-badge.png" alt="" width="96" height="96"><b>Afro<i>Writer</i></b><span>Developed by Last Dulani</span></div>
 <div id="docs" hidden>
   <div class="sheet" role="dialog" aria-label="Documents">
     <div class="dh"><b>My documents</b><button id="dnew">+ New piece</button><button id="dclose" aria-label="Close">&times;</button></div>
     <div class="flt"><button data-f="all" class="on">All</button><button data-f="draft">Drafts</button><button data-f="final">Finished</button></div>
     <div id="dlist"></div>
-    <div class="credit">AfroWriter &middot; Developed by Last Dulani</div>
+    <div class="credit">AfroWriter &middot; Developed by Last Dulani &middot; v22</div>
   </div>
 </div>
 <script>
-const $=s=>document.querySelector(s), ed=$('#ed'), title=$('#title'), st=$('#status'), K='afrowriter:doc';
-let t,mode='prose',goal=0,dstate='draft';
-function words(){const n=(ed.innerText.trim().match(/\S+/g)||[]).length;$('#count').textContent=(mode==='essay'&&goal)?n+' / '+goal+' words':n+(n===1?' word':' words')}
+const $=s=>document.querySelector(s), ed=$('#ed'), title=$('#title'), st={set textContent(v){$('#status').textContent=v;$('#fstat').textContent=v;$('#dot').className=/Saving/.test(v)?'busy':/Could not/.test(v)?'bad':''},get textContent(){return $('#status').textContent}}, K='afrowriter:doc';
+let t,mode='prose',goal=0,dstate='draft',refs=[];
+function words(){
+  const tx=ed.innerText,n=(tx.trim().match(/\S+/g)||[]).length,cnt=$('#count');
+  if(mode==='essay'&&goal)cnt.textContent=n+' / '+goal+' words';
+  else if(mode==='prose'&&n){const ch=tx.replace(/\n/g,'').length,sn=Math.max(1,(tx.match(/[.!?]+(\s|$)/g)||[]).length);cnt.textContent=n+' words \u00b7 '+ch+' chars \u00b7 '+Math.max(1,Math.round(n/230))+' min read \u00b7 '+Math.round(n/sn)+' words/sentence'}
+  else cnt.textContent=n+(n===1?' word':' words');
+}
 const LK='afrowriter:library',uid=()=>'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let lib={cur:null,docs:{}};
-function snap(){return{t:title.value,h:ed.innerHTML,m:mode,g:goal,s:dstate}}
+function getCaret(){const s=getSelection();if(!s.rangeCount||!ed.contains(s.anchorNode))return null;const r=document.createRange();r.selectNodeContents(ed);r.setEnd(s.anchorNode,s.anchorOffset);return r.toString().length}
+function setCaret(off){const w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT);let n,acc=0;while((n=w.nextNode())){const l=n.nodeValue.length;if(acc+l>=off){const r=document.createRange();r.setStart(n,off-acc);r.collapse(true);const s=getSelection();s.removeAllRanges();s.addRange(r);return}acc+=l}}
+function restoreView(d){requestAnimationFrame(()=>{$('main').scrollTop=(d&&d.sc)||0;if(d&&d.c)setCaret(d.c)})}
+const dkey=x=>[x.t,x.h,x.m,x.g,x.s,JSON.stringify(x.r||[]),x.o||''].join('\u0001');
+function snap(){const o={t:title.value,h:ed.innerHTML,m:mode,g:goal,s:dstate,r:refs,o:$('#thesisbox').value,sc:$('main').scrollTop},c=getCaret();if(c!=null)o.c=c;return o}
 function save(){
   try{
     const s=snap(),o=lib.docs[lib.cur];
-    if(o){const same=o.t===s.t&&o.h===s.h&&o.m===s.m&&o.g===s.g&&o.s===s.s;lib.docs[lib.cur]=Object.assign({},o,s,{at:same?o.at:Date.now()})}
+    if(o){const same=dkey(o)===dkey(s);lib.docs[lib.cur]=Object.assign({},o,s,{at:same?o.at:Date.now()})}
     localStorage.setItem(LK,JSON.stringify(lib));st.textContent='Saved'
   }catch(e){st.textContent='Could not save: storage full or blocked'}
 }
-function blank(m){return{t:'',h:'',m:m||'prose',g:0,s:'draft',at:Date.now()}}
-function loadDoc(id){const d=lib.docs[id];lib.cur=id;title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0;dstate=d.s||'draft'}
+function blank(m){return{t:'',h:'',m:m||'prose',g:0,s:'draft',r:[],o:'',at:Date.now()}}
+function loadDoc(id){const d=lib.docs[id];lib.cur=id;title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0;dstate=d.s||'draft';refs=d.r||[];$('#thesisbox').value=d.o||'';$('#thesis').open=!!d.o}
 function queue(){st.textContent='Saving...';words();updTab();clearTimeout(t);t=setTimeout(save,600)}
 let firstRun=false;try{firstRun=!localStorage.getItem(LK)&&!localStorage.getItem(K)}catch(e){}
 try{const l=JSON.parse(localStorage.getItem(LK)||'null');if(l&&l.docs)lib=l}catch(e){}
@@ -294,7 +354,7 @@ if(!lib.docs[lib.cur]){
     const id=uid();lib.docs[id]=d?Object.assign(blank(),d):blank();lib.cur=id}
 }
 if(!Array.isArray(lib.open))lib.open=[];lib.open=lib.open.filter(x=>lib.docs[x]);if(!lib.open.includes(lib.cur))lib.open.push(lib.cur);
-loadDoc(lib.cur);
+loadDoc(lib.cur);restoreView(lib.docs[lib.cur]);
 words();
 ed.addEventListener('input',queue);title.addEventListener('input',queue);
 ed.addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'))});
@@ -302,18 +362,26 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeo
 $('#bar').addEventListener('mousedown',e=>{if(e.target.tagName!=='SELECT')e.preventDefault()});
 $('#bar').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
+  const a=b.dataset.a;
+  if(a==='auto'){P.auto=!P.auto;apply();return}
+  if(a==='center'){P.center=!P.center;apply();return}
+  if(a==='toc'||a==='syl'||a==='refs'||a==='entries'){openSide(a);return}
+  if(a==='today'){insertToday();queue();return}
+  if(a==='find'){$('#findbar').hidden=false;$('#fq').focus();return}
+  if(b.dataset.ins==='sb'){ed.focus();document.execCommand('insertHTML',false,'<div class="sb">* * *</div><div><br></div>');queue();return}
   if(b.dataset.l){ed.focus();document.execCommand('insertHTML',false,'<div class="sec">'+b.dataset.l+'</div><div><br></div>');queue();return}
   if(b.dataset.a==='goal'){const v=prompt('Word goal (0 to clear)',goal||'500');if(v!==null){goal=Math.max(0,parseInt(v)||0);words();queue()}return}
   if(b.dataset.a==='dbl'){P.dbl=!P.dbl;apply();return}
   ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);queue();
 });
-function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);if(!lib.open.includes(id))lib.open.push(id);setMode(mode,true);words();save();renderTabs();paintState();scrollTo(0,0);$('main').scrollTop=0}
+function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);const vw={sc:lib.docs[id].sc,c:lib.docs[id].c};if(!lib.open.includes(id))lib.open.push(id);setMode(mode,true);words();save();renderTabs();paintState();scrollTo(0,0);restoreView(vw)}
 function newPiece(){closeDocs();$('#picker').hidden=false}
 function makePiece(m){
   clearTimeout(t);save();
   const c=lib.docs[lib.cur];
   if(c&&!c.t&&!ed.innerText.trim())setMode(m);
   else{const id=uid();lib.docs[id]=blank(m);openDoc(id)}
+  if(m==='journal'&&!ed.innerText.trim())insertToday();
   $('#picker').hidden=true;title.focus()
 }
 $('#newdoc').onclick=newPiece;
@@ -372,13 +440,13 @@ $('#styles').addEventListener('change',e=>{
   document.execCommand('formatBlock',false,sel.value);sel.selectedIndex=0;queue();
 });
 const PK='afrowriter:prefs',fs=$('#font');
-let P={f:fs.value,s:17};
+let P={f:fs.value,s:17,auto:true,lang:'en',cs:'apa'};
 try{P=Object.assign(P,JSON.parse(localStorage.getItem(PK)||'{}'))}catch(e){}
 function apply(){
   const r=document.documentElement.style;r.setProperty('--ef',P.f);r.setProperty('--es',P.s+'px');
   if([...fs.options].some(o=>o.value===P.f))fs.value=P.f;
   if(P.theme)document.documentElement.dataset.theme=P.theme;
-  document.body.classList.toggle('dbl',!!P.dbl);const db=$('#dbl');if(db)db.setAttribute('aria-pressed',!!P.dbl);
+  document.body.classList.toggle('dbl',!!P.dbl);document.body.classList.toggle('pc',!!P.center);$('#auto').setAttribute('aria-pressed',!!P.auto);$('#ctr').setAttribute('aria-pressed',!!P.center);const db=$('#dbl');if(db)db.setAttribute('aria-pressed',!!P.dbl);
   if(typeof paintTheme==='function')paintTheme();
   const sz=$('#size');
   if(![...sz.options].some(o=>+o.value===P.s)){const o=new Option(P.s,P.s);const nx=[...sz.options].find(x=>+x.value>P.s);sz.add(o,nx||null)}
@@ -392,7 +460,7 @@ function paintTheme(){const d=isDark();tb.innerHTML=d?ICON.sun:ICON.moon;tb.setA
 tb.addEventListener('click',()=>{P.theme=isDark()?'light':'dark';apply()});
 fs.addEventListener('change',()=>{P.f=fs.value;apply()});
 apply();
-function setMode(m,init){mode=m;document.body.dataset.mode=m;$('#mode').value=m;words();if(!init)queue()}
+function setMode(m,init){mode=m;document.body.dataset.mode=m;$('#mode').value=m;words();if(m==='journal'&&!init&&!ed.innerText.trim())insertToday();if(!init)queue()}
 $('#mode').addEventListener('change',e=>setMode(e.target.value));
 $('#focus').addEventListener('click',e=>{const on=document.body.classList.toggle('focus');e.currentTarget.setAttribute('aria-pressed',on)});
 setMode(mode,true);renderTabs();paintState();if(firstRun)$('#picker').hidden=false;
@@ -451,6 +519,9 @@ function buildDocx(root,ttl,md,dbl,fam){
     const tg=n.tagName,r=[];
     if(/^H[1-4]$/.test(tg)){wblock(n,{b:1,i:tg==='H4'?1:0,sz:{H1:36,H2:30,H3:26,H4:24}[tg]},r);out.push(wpara(r.join(''),'<w:keepNext/><w:spacing w:before="240" w:after="80"/>'));return}
     if(tg==='UL'||tg==='OL'){let k=0;n.childNodes.forEach(li=>{if(li.tagName!=='LI')return;k++;const r2=[];wruns(li,{},r2);out.push(wpara(wrun(tg==='UL'?'\u2022\t':k+'.\t',{})+r2.join(''),'<w:tabs><w:tab w:val="left" w:pos="540"/></w:tabs><w:spacing w:after="40"/><w:ind w:left="540" w:hanging="360"/>'))});return}
+    if(n.classList&&n.classList.contains('jd')){wblock(n,{b:1,sz:26},r);out.push(wpara(r.join(''),'<w:keepNext/><w:spacing w:before="280" w:after="80"/>'));return}
+    if(n.classList&&n.classList.contains('sb')){out.push(wpara(wrun('* * *',{}),'<w:spacing w:before="200" w:after="200"/><w:jc w:val="center"/>'));return}
+    if(n.classList&&n.classList.contains('ref')){wblock(n,{},r);out.push(wpara(r.join(''),'<w:spacing w:after="80"/><w:ind w:left="720" w:hanging="720"/>'));return}
     if(n.classList&&n.classList.contains('sec')){wblock(n,{b:1,caps:1,color:'D93A73',sz:20},r);out.push(wpara(r.join(''),'<w:keepNext/><w:spacing w:before="240" w:after="60"/>'));return}
     wblock(n,{},r);out.push(wpara(r.join(''),sp))
   });
@@ -516,7 +587,146 @@ ebtn.onclick=()=>setBar(!document.body.classList.contains('tb-open'));
 const TYPING=new Set(['insertText','insertCompositionText','insertLineBreak','insertParagraph','insertFromPaste','deleteContentBackward','deleteContentForward','deleteWordBackward']);
 ed.addEventListener('beforeinput',e=>{if(TYPING.has(e.inputType)&&document.body.classList.contains('tb-open'))setBar(false)});
 title.addEventListener('input',()=>{if(document.body.classList.contains('tb-open'))setBar(false)});
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+/* ---------- Journal ---------- */
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function insertToday(){
+  const d=new Date(),k=iso(d),ex=[...ed.querySelectorAll('.jd')].find(x=>x.dataset.d===k);
+  if(ex){ex.scrollIntoView({block:'center'});return ex}
+  const el=document.createElement('div');el.className='jd';el.dataset.d=k;
+  el.textContent=d.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const nx=document.createElement('div');nx.innerHTML='<br>';ed.append(el,nx);
+  const r=document.createRange();r.setStart(nx,0);r.collapse(true);const s=getSelection();s.removeAllRanges();s.addRange(r);
+  nx.scrollIntoView({block:'center'});queue();return el
+}
+$('#mood').addEventListener('change',e=>{const s=e.target,v=s.value;s.selectedIndex=0;restoreSel();
+  let n=getSelection().anchorNode;while(n&&n.parentNode!==ed)n=n.parentNode;
+  let jd=null;for(let x=n;x;x=x.previousSibling){if(x.classList&&x.classList.contains('jd')){jd=x;break}}
+  if(!jd)jd=insertToday();
+  jd.querySelectorAll('.mood').forEach(m=>m.remove());
+  const m=document.createElement('span');m.className='mood';m.textContent=' '+v;jd.append(m);queue()});
+$('#sec').addEventListener('change',e=>{const s=e.target,v=s.value;s.selectedIndex=0;restoreSel();
+  document.execCommand('insertHTML',false,'<div class="sec">'+esc(v)+'</div><div><br></div>');queue()});
+$('#thesisbox').addEventListener('input',queue);
+
+/* ---------- Typing helpers: auto-correct, and clean new lines after labels ---------- */
+function blockOf(r){let n=r.startContainer;if(n===ed)return null;while(n&&n.parentNode!==ed)n=n.parentNode;return n}
+ed.addEventListener('beforeinput',e=>{
+  const sel=getSelection();if(!sel.rangeCount||!sel.isCollapsed)return;
+  const r=sel.getRangeAt(0),b=blockOf(r);
+  if(e.inputType==='insertParagraph'&&b&&b.classList&&(b.classList.contains('jd')||b.classList.contains('sec')||b.classList.contains('sb'))){
+    e.preventDefault();const nx=document.createElement('div');nx.innerHTML='<br>';b.after(nx);
+    const rr=document.createRange();rr.setStart(nx,0);rr.collapse(true);sel.removeAllRanges();sel.addRange(rr);queue();return
+  }
+  if(!P.auto||(mode!=='prose'&&mode!=='essay')||e.inputType!=='insertText'||!e.data||e.data.length!==1)return;
+  let pre='';if(b){const rr=document.createRange();rr.setStart(b,0);rr.setEnd(r.startContainer,r.startOffset);pre=rr.toString()}
+  const ch=e.data;let out=null,del=0;
+  if(ch==='"')out=(!pre||/[\s(\[\u2014\u2013-]$/.test(pre))?'\u201C':'\u201D';
+  else if(ch==="'")out=(!pre||/[\s(\[\u2014\u2013-]$/.test(pre))?'\u2018':'\u2019';
+  else if(ch==='-'&&pre.endsWith('-')){out='\u2014';del=1}
+  else if(ch==='.'&&pre.endsWith('..')){out='\u2026';del=2}
+  else if(ch!==ch.toUpperCase()&&/\p{L}/u.test(ch)&&(pre===''||/^[\u201C\u2018("'\[]+$/.test(pre)||/[.!?]["\u201D')\]]*\s+$/.test(pre))&&!/\b(e\.g|i\.e|etc|vs|Mr|Mrs|Ms|Dr|Prof)\.\s+$/i.test(pre))out=ch.toUpperCase();
+  if(out==null)return;
+  e.preventDefault();for(let k=0;k<del;k++)document.execCommand('delete');document.execCommand('insertText',false,out);
+});
+
+/* ---------- Find and replace ---------- */
+const fq=$('#fq'),fr=$('#fr');let lastFind=null;
+function matches(){
+  const q=fq.value;if(!q)return[];const ql=q.toLowerCase(),out=[],w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT);
+  for(let n;(n=w.nextNode());){const t=n.nodeValue.toLowerCase();for(let i=t.indexOf(ql);i>=0;i=t.indexOf(ql,i+ql.length)){const r=document.createRange();r.setStart(n,i);r.setEnd(n,i+q.length);out.push(r)}}
+  return out
+}
+function pick(r,scroll){const s=getSelection();s.removeAllRanges();s.addRange(r);lastFind=r.cloneRange();ed.focus();if(scroll!==false)(r.startContainer.parentElement||ed).scrollIntoView({block:'center'})}
+function fnd(){
+  const ms=matches();if(!ms.length)return false;
+  const s=getSelection();let from=(s.rangeCount&&ed.contains(s.anchorNode))?s.getRangeAt(0):lastFind;
+  pick(ms.find(m=>from&&m.compareBoundaryPoints(Range.START_TO_START,from)>0)||ms[0]);return true
+}
+const putText=v=>{ed.focus();if(v)document.execCommand('insertText',false,v);else document.execCommand('delete')};
+$('#findbar').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const f=b.dataset.f;
+  if(f==='x'){$('#findbar').hidden=true;return}
+  if(!fq.value)return;
+  if(f==='next'){if(!fnd())st.textContent='Not found';return}
+  if(f==='rep'){
+    const s=getSelection(),on=s.rangeCount&&ed.contains(s.anchorNode)&&s.toString().toLowerCase()===fq.value.toLowerCase();
+    if(!on){if(!fnd())st.textContent='Not found';return}
+    putText(fr.value);queue();fnd();return
+  }
+  if(f==='all'){const ms=matches();for(let k=ms.length-1;k>=0;k--){pick(ms[k],false);putText(fr.value)}queue();st.textContent=ms.length+' replaced'}
+});
+
+/* ---------- Side sheets: contents, syllables, references, entries ---------- */
+let sideKind=null;
+function closeSide(){$('#side').hidden=true;sideKind=null}
+$('#sideclose').onclick=closeSide;
+$('#side').addEventListener('click',e=>{if(e.target.id==='side')closeSide()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSide()});
+function openSide(k){sideKind=k;$('#side').hidden=false;renderSide()}
+const jump=el=>{closeSide();el.scrollIntoView({block:'start',behavior:'smooth'})};
+function sylEN(w){w=w.toLowerCase().replace(/[^a-z]/g,'');if(!w)return 0;if(w.length<=3)return 1;if(!/[td]ed$/.test(w))w=w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,'');w=w.replace(/^y/,'');const m=w.match(/[aeiouy]{1,2}/g);return m?m.length:1}
+const sylSN=w=>(w.toLowerCase().match(/[aeiou]/g)||[]).length;
+const sylOf=line=>(line.match(/[\p{L}']+/gu)||[]).reduce((a,w)=>a+(P.lang==='sn'?sylSN(w):sylEN(w)),0);
+const sname=x=>x.split(',')[0].trim();
+function auth(a){const p=a.split(';').map(x=>x.trim()).filter(Boolean);if(p.length<2)return p[0]||'';return P.cs==='apa'?p.slice(0,-1).join(', ')+', & '+p[p.length-1]:p.slice(0,-1).join(', ')+' and '+p[p.length-1]}
+function citeOf(r){const p=r.a.split(';').map(x=>x.trim()).filter(Boolean);const n=p.length>2?sname(p[0])+' et al.':p.length===2?sname(p[0])+(P.cs==='apa'?' & ':' and ')+sname(p[1]):sname(p[0]||'Anon');return '('+n+(P.cs==='apa'?', ':' ')+(r.y||'n.d.')+')'}
+function refHtml(r){
+  const A=esc(auth(r.a)||'Anon'),y=esc(r.y||'n.d.'),T=esc(r.t),S=esc(r.s||''),I=x=>'<i>'+x+'</i>',U=esc(r.u||''),
+    head=P.cs==='apa'?A+' ('+y+'). ':A+' '+y+'. ';
+  if(r.k==='article')return head+(P.cs==='apa'?T+'. ':'\u2018'+T+'\u2019, ')+I(S)+(r.d?', '+esc(r.d):'')+'.';
+  if(r.k==='web')return head+I(T)+'. '+(S?S+'. ':'')+(P.cs==='apa'?U:'Available at: '+U+' (Accessed: '+new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'})+').');
+  return head+I(T)+'. '+S+'.';
+}
+function renderSide(){
+  const body=$('#sidebody');
+  const T={toc:'Contents',syl:'Syllables',refs:'References',entries:'Journal entries'}[sideKind];
+  $('#sidetitle').textContent=T;
+  if(sideKind==='toc'){
+    const hs=[...ed.querySelectorAll('h1,h2,h3,h4')];
+    body.innerHTML=hs.length?hs.map((x,i)=>'<button class="tocr l'+x.tagName[1]+'" data-i="'+i+'">'+esc(x.textContent||'(empty heading)')+'</button>').join(''):'<div class="note">No headings yet. Use Styles to add Heading 1 to 4 and they will appear here.</div>';
+    body.onclick=e=>{const b=e.target.closest('.tocr');if(b)jump(hs[+b.dataset.i])};
+  }else if(sideKind==='entries'){
+    const js=[...ed.querySelectorAll('.jd')];
+    body.innerHTML=js.length?js.map((x,i)=>'<button class="tocr" data-i="'+i+'">'+esc(x.textContent)+'</button>').join(''):'<div class="note">No entries yet. Tap Today to add one.</div>';
+    body.onclick=e=>{const b=e.target.closest('.tocr');if(b)jump(js[+b.dataset.i])};
+  }else if(sideKind==='syl'){
+    const G=[{n:'',l:[]}];
+    [...ed.childNodes].forEach(k=>{const tx=(k.textContent||'').replace(/\u00a0/g,' ').trim();if(!tx)return;if(k.classList&&k.classList.contains('sec'))G.push({n:tx,l:[]});else G[G.length-1].l.push(tx)});
+    let html='<div class="seg"><button data-lang="en" class="'+(P.lang==='en'?'on':'')+'">English</button><button data-lang="sn" class="'+(P.lang==='sn'?'on':'')+'">Shona / Chewa</button></div>';
+    const any=G.some(g=>g.l.length);
+    G.forEach(g=>{if(!g.l.length&&!g.n)return;if(g.n)html+='<div class="sh">'+esc(g.n)+' \u00b7 '+g.l.length+(g.l.length===1?' line':' lines')+'</div>';g.l.forEach(l=>{html+='<div class="sl"><b>'+sylOf(l)+'</b><span>'+esc(l)+'</span></div>'})});
+    if(!any)html+='<div class="note">Write a few lines and their syllable counts will show here.</div>';
+    body.innerHTML=html+'<div class="note">Counts are estimates. English uses common spelling rules; Shona and Chewa count vowels.</div>';
+    body.onclick=e=>{const b=e.target.closest('[data-lang]');if(b){P.lang=b.dataset.lang;apply();renderSide()}};
+  }else if(sideKind==='refs'){
+    const rows=refs.map((r,i)=>'<div class="rr"><span>'+esc(citeOf(r))+' \u2013 '+esc(r.t)+'</span><button data-cite="'+i+'">Cite</button><button data-del="'+i+'" aria-label="Remove">&times;</button></div>').join('');
+    body.innerHTML='<div class="seg"><button data-cs="apa" class="'+(P.cs==='apa'?'on':'')+'">APA 7</button><button data-cs="harvard" class="'+(P.cs==='harvard'?'on':'')+'">Harvard</button></div>'+
+      '<div class="rf"><select id="rt"><option value="book">Book</option><option value="article">Journal article</option><option value="web">Website</option></select><input id="ra" placeholder="Author(s): Surname, I.; Surname, I."><input id="ry" placeholder="Year"><input id="rtl" placeholder="Title"><input id="rs" placeholder="Publisher, journal or website name"><input id="rd" placeholder="Volume(issue), pages (articles)"><input id="ru" placeholder="Link (websites)"><button id="radd" class="rb">Add source</button></div>'+
+      '<div class="sh">Your sources</div>'+(rows||'<div class="note">No sources yet.</div>')+(refs.length?'<button id="rins" class="rb ghost">Insert reference list at cursor</button>':'');
+    body.onclick=e=>{
+      const t=e.target;
+      if(t.dataset.cs){P.cs=t.dataset.cs;apply();renderSide();return}
+      if(t.id==='radd'){const g=id=>$('#'+id).value.trim(),r={k:g('rt'),a:g('ra'),y:g('ry'),t:g('rtl'),s:g('rs'),d:g('rd'),u:g('ru')};if(!r.t||!r.a){st.textContent='Add an author and a title';return}refs.push(r);queue();renderSide();return}
+      if(t.dataset.del){refs.splice(+t.dataset.del,1);queue();renderSide();return}
+      if(t.dataset.cite){const c=citeOf(refs[+t.dataset.cite]);closeSide();restoreSel();document.execCommand('insertText',false,c);queue();return}
+      if(t.id==='rins'){const list=[...refs].sort((x,y)=>(auth(x.a)).localeCompare(auth(y.a)));closeSide();restoreSel();
+        document.execCommand('insertHTML',false,'<h2>References</h2>'+list.map(r=>'<div class="ref">'+refHtml(r)+'</div>').join('')+'<div><br></div>');queue()}
+    };
+  }
+}
+if('serviceWorker' in navigator){
+  const had=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    reg.update().catch(()=>{});
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})});
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(!had)return;
+    const a=document.activeElement;
+    if(a!==ed&&a!==title){save();location.reload()}
+  });
+}
 </script>
 </body>
 </html>
