@@ -329,6 +329,7 @@ main{overflow:visible;padding:0}
       <button class="card lang" data-lg="nd"><b>Ndebele</b></button>
       <button class="card lang" data-lg="ny"><b>Chewa</b></button>
       <button class="card lang" data-lg="to"><b>Tonga</b></button>
+      <button class="card lang" data-lg="tn"><b>Tswana</b></button>
     </div>
     <div id="soon" role="status" hidden></div>
   </div>
@@ -607,7 +608,7 @@ function lastDoc(){
   if(!ids.length)return null;
   return ids.includes(lib.cur)?lib.cur:ids.sort((a,b)=>lib.docs[b].at-lib.docs[a].at)[0]
 }
-const LANGS={sn:'Shona',nd:'Ndebele',ny:'Chewa',to:'Tonga'};
+const LANGS={sn:'Shona',nd:'Ndebele',ny:'Chewa',to:'Tonga',tn:'Tswana'};
 $('#welcome').addEventListener('click',e=>{
   const c=e.target.closest('.lang');if(!c)return;
   const code=c.dataset.lg,soon=$('#soon');
