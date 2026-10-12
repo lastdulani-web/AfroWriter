@@ -173,6 +173,7 @@ body[data-mode=script] .page{max-width:640px}
 .wh span{color:var(--mute);font-size:15px}
 #soon{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);border-left:4px solid var(--pop);font-size:14px}
 #soon[hidden]{display:none}
+body[data-ui=sn] #bar select{width:auto;max-width:176px}
 @media(max-width:600px){#ed .s-c{padding-left:26%}#ed .s-d{padding:0 8% 0 12%}#ed .s-p{padding:0 14% 0 20%}}
 @media(max-width:600px){
 #tabs:has(.tab:only-of-type){display:none}
@@ -325,11 +326,11 @@ main{overflow:visible;padding:0}
     <div class="wh"><b>Hi, welcome to AfroWriter.</b><span>Which language do you prefer?</span></div>
     <div class="cards">
       <button class="card lang" data-lg="en"><b>English</b></button>
-      <button class="card lang" data-lg="sn"><b>Shona</b></button>
-      <button class="card lang" data-lg="nd"><b>Ndebele</b></button>
-      <button class="card lang" data-lg="ny"><b>Chewa</b></button>
-      <button class="card lang" data-lg="to"><b>Tonga</b></button>
-      <button class="card lang" data-lg="tn"><b>Tswana</b></button>
+      <button class="card lang" data-lg="sn"><b>chiShona</b></button>
+      <button class="card lang" data-lg="nd"><b>isiNdebele</b></button>
+      <button class="card lang" data-lg="ny"><b>Chichewa</b></button>
+      <button class="card lang" data-lg="to"><b>chiTonga</b></button>
+      <button class="card lang" data-lg="tn"><b>Setswana</b></button>
     </div>
     <div id="soon" role="status" hidden></div>
   </div>
@@ -355,18 +356,62 @@ main{overflow:visible;padding:0}
     <div class="dh"><b>My documents</b><button id="dnew">+ New piece</button><button id="dclose" aria-label="Close">&times;</button></div>
     <div class="flt"><button data-f="all" class="on">All</button><button data-f="draft">Drafts</button><button data-f="final">Finished</button></div>
     <div id="dlist"></div>
-    <div class="credit">AfroWriter &middot; Developed by Last Dulani &middot; v22</div>
+    <div class="credit">AfroWriter &middot; <span>Developed by Last Dulani</span> &middot; v22</div>
   </div>
 </div>
 <script>
-const $=s=>document.querySelector(s), ed=$('#ed'), title=$('#title'), st={set textContent(v){$('#status').textContent=v;$('#fstat').textContent=v;$('#dot').className=/Saving/.test(v)?'busy':/Could not/.test(v)?'bad':''},get textContent(){return $('#status').textContent}}, K='afrowriter:doc';
+const $=s=>document.querySelector(s), ed=$('#ed'), title=$('#title'), st={set textContent(v){const w=trs(v);$('#status').textContent=w;$('#fstat').textContent=w;$('#dot').className=/Saving/.test(v)?'busy':/Could not/.test(v)?'bad':''},get textContent(){return $('#status').textContent}}, K='afrowriter:doc';
+/* ---------- Languages ---------- */
+let UI='en';
+const SN={"Developed by Last Dulani":"Yakagadzirwa naLast Dulani","Ready":"Zvagadzirwa","New":"Nyowani","My documents":"Magwaro angu","+ New piece":"+ Chinyorwa chitsva","All":"Zvese","Drafts":"Zvisina kupedziswa","Finished":"Zvakapedziswa","Draft":"Chisina kupedziswa","Untitled":"Pasina zita","No pieces yet":"Hapana chati chanyorwa","{mode} · {status} · {n} words · {time}":"{mode} · {status} · mashoko {n} · {time}","What are you writing?":"Uri kunyora chii?","Prose":"Nyaya","Poem":"Nhetembo","Lyrics":"Nziyo","Essay":"Rondedzero","Journal":"Zvakaitika","Script":"Mutambo","Stories, chapters and long-form writing, laid out like a book page.":"Nyaya, zvitsauko nezvinyorwa zvakareba, zvakarongeka sepeji rebhuku.","Keeps every line break exactly as you type it.":"Inochengetedza mitsetse semanyorero aunoita.","Songs, with Verse, Chorus and Bridge labels.":"Nziyo, dziine zvikamu zve-Verse, Chorus neBridge.","Structured writing with a word goal and double spacing.":"Chinyorwa chakarongeka chiine chinangwa chemashoko nezvakasiyana pakati pemitsetse.","Daily entries with the date added for you, plus a mood tag.":"Zvakanyorwa pazuva zvine zuva racho, pamwe nemanzwiro ako.","Screenplays and stage scripts, with scene headings and dialogue, in Courier.":"Mitsara yemutambo neyechiratidziro, ine misoro yezviitiko nenhaurirano, mumavara eCourier.","Take me to my last document":"Ndiendese kugwaro rangu rekupedzisira","Mode":"Mandiriri (Mode)","Format":"Maumbirwo","Styles":"Mhando dzekunyora","Normal text":"Chinyorwa chinongowanzwa","Heading 1":"Musoro 1","Heading 2":"Musoro 2","Heading 3":"Musoro 3","Heading 4":"Musoro 4","List":"Urongwa","Bulleted list":"Urongwa hune madhiki","Numbered list":"Urongwa hune manhamba","Export":"Tumira","Contents":"Zviri mukati","Center":"Pakati","Syllables":"Chikamu chezwi","Section":"Chikamu","Verse":"Ndima","Pre-Chorus":"Nhanganyaya yeChorus","Chorus":"Dairani (Chorus)","Outro":"Mhedziso","Instrumental Break":"Panozorora vaimbi (Instrumental)","Goal":"Chinangwa","2×":"Kasiri 2","References":"Zvinyorwa zvakashandiswa","Thesis & outline":"Pfungwa guru nemagadzirwo","Pin your thesis and main points here. They stay with this essay but are not part of the text.":"Isa pfungwa dzako huru nemapoinzi pano. Zvinoramba zviri parondedzero iyi asi hazvisi zvimwe zvemashoko endima.","Today":"Nhasi","Mood":"Manzwiro","Happy":"Mufaro","Good":"Zvakanaka","Okay":"Zviri nani","Low":"Zvakadzikira","Sad":"Kusuwa","Entries":"Zvakanyorwa","Line type":"Mhando yemutsetse","Scene Heading":"Musoro weChitiko","Action":"Chiitiko","Character":"Munhu","Dialogue":"Nhaurirano","Parenthetical":"Zviri mumakomborero (Parenthetical)","Transition":"Kuchinja kwechitiko","Scenes":"Zviitiko","Find":"Tsvaga","Replace with":"Tsiva ne","Next":"Inotevera","Replace":"Tsiva","Start writing here. Everything saves on your device.":"Tanga kunyora pano. Zvese zvinochengetedzwa parunhare/komputa ino.","Saved":"Zvachengetedzwa","Saving...":"Zviri kuchengetedzwa...","Journal entries":"Zvakanyorwa mumagwaro ezvakaitika","No headings yet. Use Styles to add Heading 1 to 4 and they will appear here.":"Hapasati paane misoro. Shandisa Mhando dzekunyora kuwedzera Musoro 1 kusvikira ku4 kuti zvibude pano.","(empty heading)":"(musoro usina chinhu)","No scenes yet. Set a line to Scene Heading, like INT. KITCHEN - DAY.":"Hapasati pave nezviitiko. Isa mutsetse kuMusoro weChitiko, senge INT. KITCHEN - DAY.","No entries yet. Tap Today to add one.":"Hapasati pave zvakanyorwa. Dzvanya Nhasi kuwedzera chinyorwa.","Shona / Chewa":"chiShona / chiChewa","{n} line":"mutsetse {n}","{n} lines":"mitsetse {n}","Write a few lines and their syllable counts will show here.":"Nyora mitsetse mishoma, huwandu hwezvipandeko huchabuda pano.","Counts are estimates. English uses common spelling rules; Shona and Chewa count vowels.":"Huwandu kukiya chete. Chirungu chine mitemo yekuspera; chiShona nechiChewa zvinoverenga zvakandwa (vowels).","Book":"Bhuku","Journal article":"Chinyorwa chemuGwaro","Website":"Dande Mutande (Website)","Author(s): Surname, I.; Surname, I.":"Muimbi/Munyori: Zita Remhuri, I.; Zita Remhuri, I.","Year":"Gore","Title":"Musoro","Publisher, journal or website name":"Mutsikisi, gwaro kana zita reDande Mutande","Volume(issue), pages (articles)":"Vhoriyumu(Nyaya), maseji (zvinyorwa)","Link (websites)":"Link (mawebsite)","Add source":"Wedzera kwakabva mashoko","Your sources":"Kwakabva mashoko ako","No sources yet.":"Hapasati pave nekwakabva mashoko.","Cite":"Nanga kwakabva mashoko (Cite)","Insert reference list at cursor":"Isa urongwa hwekwakabva mashoko pane cursor","Could not save: storage full or blocked":"Yakundikana kuchengeta: ndawo yazara kana kuvharwa","Word file ready":"Gwaro reWord ragadzirwa","Select some text first":"Tanga wasarudza zvimwe zvinyorwa","Not found":"Hazvisati zvawanikwa","{n} replaced":"{n} zvatsiviwa","Add an author and a title":"Wedzera munyori nemusoro","Word goal (0 to clear)":"Chinangwa chemashoko (0 kubvisa)","Rename this piece":"Shandura zita nechinyorwa ichi","Delete \"{title}\" from this device? This cannot be undone.":"Bvisa \"{title}\" pachigadzirwa ichi? Izvi hazvigoni kudzorerwa kumashure.","{n} word":"shoko {n}","{n} words":"mashoko {n}","{n} / {goal} words":"mashoko {n} / {goal}","{n} words · {c} chars · {m} min read · {s} words/sentence":"mashoko {n} · mavara {c} · maminitsi {m} ekuverenga · mashoko {s}/pamutsetse","~{n} page · {w} words":"~peji {n} · mashoko {w}","~{n} pages · {w} words":"~mapeji {n} · mashoko {w}","just now":"iye zvino","{n} min ago":"maminitsi {n} akapfuura","{n} h ago":"maawa {n} akapfuura","{n} day ago":"zuva {n} rakapfuura","{n} days ago":"mazuva {n} akapfuura","Available at:":"Inowanikwa pa:","Accessed:":"Zvawanikwa pazuva ra:","n.d.":"n.d. (pausina zuva)","et al.":"nevamwe (et al.)","and":"uye","Anon":"Zvisina zita","Welcome":"Mauya / Titambire","Documents":"Magwaro","New piece":"Chinyorwa chitsva","Switch to dark mode":"Shandura kuenda ku-Dark Mode","Switch to light mode":"Shandura kuenda ku-Light Mode","Open pieces":"Zvinyorwa zvakavhurwa","Formatting":"Rongedzo","Writing mode":"Mandiriri ekunyora","Auto-correct":"Kugadzirisa zvoga","Scene break":"Kumbomira kwechitiko","Insert section":"Isa chikamu","Set word goal":"Isa chinangwa chemashoko","Double spacing":"Mikaha miviri yekunyora","Text size":"Saizi yemavara","Change case":"Shandura mavara","Undo":"Dzorera shure","Redo":"Ita zvakare","Find and replace":"Tsvaga nekutsiva","Close":"Vhara","Draft. Tap to mark as finished":"Chisina kupedziswa. Dzvanya kuratidza kuti chakapedziswa","Finished. Tap to mark as draft":"Chakapedziswa. Dzvanya kuratidza sechisina kupedziswa","Rename":"Ipa rimwe zita","Delete":"Bvisa","Close tab":"Vhara tebhu","Remove":"Bvisa","AfroWriter logo":"Rogo yeAfroWriter","Hi, welcome to AfroWriter.":"Mhoro, titambire kuAfroWriter.","Which language do you prefer?":"Unofarira mutauro upi?","Ndebele":"chiNdebele","Chewa":"chiChewa","Tonga":"chiTonga","Tswana":"chiTswana","{language} is coming soon. Please choose English for now.":"{language} iri kuuya munguva pfupi iri kutevera. Sarudza Chirungu kana chiShona parizvino.","A free, offline writing app.":"App yemahara, inoshanda pasina indaneti."};
+const DICT={sn:SN};
+function trs(s){
+  if(UI==='en'||typeof s!=='string'||!s)return s;const d=DICT[UI];if(!d)return s;
+  if(d[s]!=null)return d[s];
+  const m=s.match(/^([\p{Extended_Pictographic}\uFE0F\s]+)(.+)$/u);if(m&&d[m[2]]!=null)return m[1]+d[m[2]];
+  const c=s[0]+s.slice(1).toLowerCase();if(c!==s&&d[c]!=null)return d[c];
+  return s
+}
+const trf=(s,v)=>trs(s).replace(/\{(\w+)\}/g,(m,k)=>v[k]!=null?v[k]:m);
+const ATTRS=['placeholder','aria-label','title','alt','data-ph'],ORIG=new WeakMap();
+function trEl(el){
+  if(!el||el.nodeType!==1||/^(SCRIPT|STYLE|SVG|PATH|CIRCLE)$/i.test(el.tagName))return;
+  const isEd=el===ed;if((!isEd&&el.closest('#ed'))||el.closest('[data-u]'))return;
+  let o=ORIG.get(el);if(!o){o={a:{},ao:{},tx:null,out:null};ORIG.set(el,o)}
+  for(const a of ATTRS){
+    const cur=el.getAttribute(a);if(cur==null)continue;
+    const base=(o.ao[a]!==undefined&&cur===o.ao[a])?o.a[a]:cur;o.a[a]=base;
+    const out=trs(base);o.ao[a]=out;if(cur!==out)el.setAttribute(a,out)
+  }
+  const k=el.childNodes;
+  if(!isEd&&el.tagName!=='TEXTAREA'&&k.length===1&&k[0].nodeType===3&&k[0].nodeValue.trim()){
+    const cur=k[0].nodeValue,base=(o.out!=null&&cur===o.out)?o.tx:cur;o.tx=base;
+    const m=base.match(/^(\s*)([\s\S]*?)(\s*)$/),out=m[1]+trs(m[2])+m[3];o.out=out;if(cur!==out)k[0].nodeValue=out
+  }
+}
+let obs=null;
+function startObs(){
+  if(obs)return;
+  obs=new MutationObserver(ms=>{for(const m of ms){
+    const n=m.target;if(n.nodeType!==1||n===ed||ed.contains(n))continue;
+    trEl(n);if(m.type==='childList')m.addedNodes.forEach(a=>{if(a.nodeType===1){trEl(a);a.querySelectorAll('*').forEach(trEl)}})
+  }});
+  obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:ATTRS})
+}
+function setUI(code){
+  UI=code;document.body.dataset.ui=code;
+  trEl(ed);document.querySelectorAll('body *').forEach(trEl);
+  if(code!=='en')startObs();
+  renderTabs();paintState();words();
+}
+
 let t,mode='prose',goal=0,dstate='draft',refs=[];
 function words(){
   const tx=ed.innerText,n=(tx.trim().match(/\S+/g)||[]).length,cnt=$('#count');
-  if(mode==='essay'&&goal)cnt.textContent=n+' / '+goal+' words';
-  else if(mode==='prose'&&n){const ch=tx.replace(/\n/g,'').length,sn=Math.max(1,(tx.match(/[.!?]+(\s|$)/g)||[]).length);cnt.textContent=n+' words \u00b7 '+ch+' chars \u00b7 '+Math.max(1,Math.round(n/230))+' min read \u00b7 '+Math.round(n/sn)+' words/sentence'}
-  else if(mode==='script'){let L=0;const W={h:60,a:60,c:35,d:35,p:25,t:60};[...ed.children].forEach(k=>{const m=String(k.className).match(/s-(\w)/),t=m?m[1]:'a',len=(k.textContent||'').trim().length;if(!len)return;L+=Math.ceil(len/W[t])+(t==='d'||t==='p'?0:1)});const pg=Math.max(1,Math.ceil(L/55));cnt.textContent='~'+pg+(pg===1?' page':' pages')+' \u00b7 '+n+' words'}
-  else cnt.textContent=n+(n===1?' word':' words');
+  if(mode==='essay'&&goal)cnt.textContent=trf('{n} / {goal} words',{n:n,goal:goal});
+  else if(mode==='prose'&&n){const ch=tx.replace(/\n/g,'').length,sn=Math.max(1,(tx.match(/[.!?]+(\s|$)/g)||[]).length);cnt.textContent=trf('{n} words \u00b7 {c} chars \u00b7 {m} min read \u00b7 {s} words/sentence',{n:n,c:ch,m:Math.max(1,Math.round(n/230)),s:Math.round(n/sn)})}
+  else if(mode==='script'){let L=0;const W={h:60,a:60,c:35,d:35,p:25,t:60};[...ed.children].forEach(k=>{const m=String(k.className).match(/s-(\w)/),t=m?m[1]:'a',len=(k.textContent||'').trim().length;if(!len)return;L+=Math.ceil(len/W[t])+(t==='d'||t==='p'?0:1)});const pg=Math.max(1,Math.ceil(L/55));cnt.textContent=trf(pg===1?'~{n} page \u00b7 {w} words':'~{n} pages \u00b7 {w} words',{n:pg,w:n})}
+  else cnt.textContent=trf(n===1?'{n} word':'{n} words',{n:n});
 }
 const LK='afrowriter:library',uid=()=>'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let lib={cur:null,docs:{}};
@@ -410,7 +455,7 @@ $('#bar').addEventListener('click',e=>{
   if(a==='find'){$('#findbar').hidden=false;$('#fq').focus();return}
   if(b.dataset.ins==='sb'){ed.focus();document.execCommand('insertHTML',false,'<div class="sb">* * *</div><div><br></div>');queue();return}
   if(b.dataset.l){ed.focus();document.execCommand('insertHTML',false,'<div class="sec">'+b.dataset.l+'</div><div><br></div>');queue();return}
-  if(b.dataset.a==='goal'){const v=prompt('Word goal (0 to clear)',goal||'500');if(v!==null){goal=Math.max(0,parseInt(v)||0);words();queue()}return}
+  if(b.dataset.a==='goal'){const v=prompt(trs('Word goal (0 to clear)'),goal||'500');if(v!==null){goal=Math.max(0,parseInt(v)||0);words();queue()}return}
   if(b.dataset.a==='dbl'){P.dbl=!P.dbl;apply();return}
   ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);queue();
 });
@@ -429,16 +474,16 @@ $('#newdoc').onclick=newPiece;
 const IC={pen:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',del:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>'};
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const wcount=x=>(x||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').split(/\s+/).filter(Boolean).length;
-function ago(ts){const m=Math.floor((Date.now()-ts)/6e4);if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.floor(m/60);if(h<24)return h+' h ago';const d=Math.floor(h/24);return d+(d===1?' day ago':' days ago')}
+function ago(ts){const m=Math.floor((Date.now()-ts)/6e4);if(m<1)return trs('just now');if(m<60)return trf('{n} min ago',{n:m});const h=Math.floor(m/60);if(h<24)return trf('{n} h ago',{n:h});const d=Math.floor(h/24);return trf(d===1?'{n} day ago':'{n} days ago',{n:d})}
 function renderDocs(){
   const items=Object.entries(lib.docs).filter(([,d])=>dfilter==='all'||(d.s||'draft')===dfilter).sort((a,b)=>b[1].at-a[1].at);
-  $('#dlist').innerHTML=items.map(([id,d])=>'<div class="row'+(id===lib.cur?' cur':'')+'" data-id="'+id+'"><button class="info" data-o="1"><span class="n">'+esc(d.t||'Untitled')+'</span><span class="s">'+d.m[0].toUpperCase()+d.m.slice(1)+' &middot; '+(d.s==='final'?'Finished':'Draft')+' &middot; '+wcount(d.h)+' words &middot; '+ago(d.at)+'</span></button><button class="ib" data-r="1" aria-label="Rename">'+IC.pen+'</button><button class="ib" data-x="1" aria-label="Delete">'+IC.del+'</button></div>').join('')||'<div class="empty">No pieces yet</div>';
+  $('#dlist').innerHTML=items.map(([id,d])=>'<div class="row'+(id===lib.cur?' cur':'')+'" data-id="'+id+'"><button class="info" data-o="1"><span data-u class="n">'+esc(d.t||trs('Untitled'))+'</span><span class="s">'+esc(trf('{mode} \u00b7 {status} \u00b7 {n} words \u00b7 {time}',{mode:trs(d.m[0].toUpperCase()+d.m.slice(1)),status:trs(d.s==='final'?'Finished':'Draft'),n:wcount(d.h),time:ago(d.at)}))+'</span></button><button class="ib" data-r="1" aria-label="Rename">'+IC.pen+'</button><button class="ib" data-x="1" aria-label="Delete">'+IC.del+'</button></div>').join('')||'<div class="empty">No pieces yet</div>';
 }
 let dfilter='all';
-function updTab(){const l=document.querySelector('#tabs .on .tl');if(l)l.textContent=title.value.trim()||'Untitled'}
+function updTab(){const l=document.querySelector('#tabs .on .tl');if(l)l.textContent=title.value.trim()||trs('Untitled')}
 function renderTabs(){
   const bar=$('#tabs');
-  bar.innerHTML=lib.open.map(id=>{const d=lib.docs[id],on=id===lib.cur,n=on?title.value.trim():(d.t||'');return '<div class="tab'+(on?' on':'')+'" data-id="'+id+'" role="tab" aria-selected="'+on+'"><button class="tl">'+esc(n||'Untitled')+'</button><button class="tx" aria-label="Close tab">&times;</button></div>'}).join('')+'<button id="tplus" aria-label="New piece">+</button>';
+  bar.innerHTML=lib.open.map(id=>{const d=lib.docs[id],on=id===lib.cur,n=on?title.value.trim():(d.t||'');return '<div class="tab'+(on?' on':'')+'" data-id="'+id+'" role="tab" aria-selected="'+on+'"><button data-u class="tl">'+esc(n||trs('Untitled'))+'</button><button class="tx" aria-label="Close tab">&times;</button></div>'}).join('')+'<button id="tplus" aria-label="New piece">+</button>';
   const on=bar.querySelector('.on');if(on)on.scrollIntoView({inline:'nearest',block:'nearest'});
 }
 function closeTab(id){
@@ -453,7 +498,7 @@ $('#tabs').addEventListener('click',e=>{
   const tb=e.target.closest('.tab');if(!tb)return;const id=tb.dataset.id;
   if(e.target.closest('.tx'))closeTab(id);else if(id!==lib.cur)openDoc(id);
 });
-function paintState(){const b=$('#state'),f=dstate==='final';b.textContent=f?'Finished':'Draft';b.classList.toggle('fin',f);b.setAttribute('aria-label',f?'Finished. Tap to mark as draft':'Draft. Tap to mark as finished')}
+function paintState(){const b=$('#state'),f=dstate==='final';b.textContent=trs(f?'Finished':'Draft');b.classList.toggle('fin',f);b.setAttribute('aria-label',trs(f?'Finished. Tap to mark as draft':'Draft. Tap to mark as finished'))}
 $('#state').onclick=()=>{dstate=dstate==='final'?'draft':'final';paintState();queue()};
 $('.flt').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;dfilter=b.dataset.f;document.querySelectorAll('.flt button').forEach(x=>x.classList.toggle('on',x===b));renderDocs()});
 function openDocs(){clearTimeout(t);save();renderDocs();$('#docs').hidden=false}
@@ -463,9 +508,9 @@ $('#docs').addEventListener('click',e=>{if(e.target.id==='docs')closeDocs()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDocs();$('#picker').hidden=true}});
 $('#dlist').addEventListener('click',e=>{
   const row=e.target.closest('.row');if(!row)return;const id=row.dataset.id,d=lib.docs[id];
-  if(e.target.closest('[data-r]')){const v=prompt('Rename this piece',d.t||'');if(v!==null){d.t=v.trim();if(id===lib.cur)title.value=d.t;save();renderDocs();renderTabs()}return}
+  if(e.target.closest('[data-r]')){const v=prompt(trs('Rename this piece'),d.t||'');if(v!==null){d.t=v.trim();if(id===lib.cur)title.value=d.t;save();renderDocs();renderTabs()}return}
   if(e.target.closest('[data-x]')){
-    if(!confirm('Delete "'+(d.t||'Untitled')+'" from this device? This cannot be undone.'))return;
+    if(!confirm(trf('Delete "{title}" from this device? This cannot be undone.',{title:d.t||trs('Untitled')})))return;
     delete lib.docs[id];lib.open=lib.open.filter(x=>x!==id);
     if(id===lib.cur){const ids=Object.keys(lib.docs).sort((a,b)=>lib.docs[b].at-lib.docs[a].at);const nid=lib.open[0]||ids[0]||uid();if(!lib.docs[nid])lib.docs[nid]=blank(mode);openDoc(nid)}
     else{save();renderTabs()}
@@ -608,15 +653,15 @@ function lastDoc(){
   if(!ids.length)return null;
   return ids.includes(lib.cur)?lib.cur:ids.sort((a,b)=>lib.docs[b].at-lib.docs[a].at)[0]
 }
-const LANGS={sn:'Shona',nd:'Ndebele',ny:'Chewa',to:'Tonga',tn:'Tswana'};
+const LANGS={nd:'isiNdebele',ny:'Chichewa',to:'chiTonga',tn:'Setswana'},READY=['en','sn'];
 $('#welcome').addEventListener('click',e=>{
   const c=e.target.closest('.lang');if(!c)return;
   const code=c.dataset.lg,soon=$('#soon');
-  document.querySelectorAll('#welcome .lang').forEach(x=>x.classList.toggle('sel',x===c&&code!=='en'));
-  if(code!=='en'){soon.textContent=LANGS[code]+' is coming soon. Please choose English for now.';soon.hidden=false;return}
-  soon.hidden=true;$('#welcome').hidden=true;
+  document.querySelectorAll('#welcome .lang').forEach(x=>x.classList.toggle('sel',x===c&&!READY.includes(code)));
+  if(!READY.includes(code)){soon.textContent=LANGS[code]+' is coming soon. Please choose English or chiShona for now.';soon.hidden=false;return}
+  soon.hidden=true;setUI(code);$('#welcome').hidden=true;
   const id=lastDoc(),lc=$('#lastcard');lc.hidden=!id;
-  if(id){const d=lib.docs[id];$('#lastinfo').textContent=(d.t.trim()||'Untitled')+' \u00b7 '+d.m[0].toUpperCase()+d.m.slice(1)+' \u00b7 '+ago(d.at)}
+  if(id){const d=lib.docs[id];$('#lastinfo').textContent=trf('{title} \u00b7 {mode} \u00b7 {time}',{title:d.t.trim()||trs('Untitled'),mode:trs(d.m[0].toUpperCase()+d.m.slice(1)),time:ago(d.at)})}
   $('#picker').hidden=false;
 });
 $('#picker').addEventListener('click',e=>{
@@ -673,7 +718,7 @@ $('#mood').addEventListener('change',e=>{const s=e.target,v=s.value;s.selectedIn
   jd.querySelectorAll('.mood').forEach(m=>m.remove());
   const m=document.createElement('span');m.className='mood';m.textContent=' '+v;jd.append(m);queue()});
 $('#sec').addEventListener('change',e=>{const s=e.target,v=s.value;s.selectedIndex=0;restoreSel();
-  document.execCommand('insertHTML',false,'<div class="sec">'+esc(v)+'</div><div><br></div>');queue()});
+  document.execCommand('insertHTML',false,'<div class="sec">'+esc(trs(v))+'</div><div><br></div>');queue()});
 $('#thesisbox').addEventListener('input',queue);
 
 /* ---------- Typing helpers: auto-correct, and clean new lines after labels ---------- */
@@ -748,7 +793,7 @@ $('#findbar').addEventListener('click',e=>{
     if(!on){if(!fnd())st.textContent='Not found';return}
     putText(fr.value);queue();fnd();return
   }
-  if(f==='all'){const ms=matches();for(let k=ms.length-1;k>=0;k--){pick(ms[k],false);putText(fr.value)}queue();st.textContent=ms.length+' replaced'}
+  if(f==='all'){const ms=matches();for(let k=ms.length-1;k>=0;k--){pick(ms[k],false);putText(fr.value)}queue();st.textContent=trf('{n} replaced',{n:ms.length})}
 });
 
 /* ---------- Side sheets: contents, syllables, references, entries ---------- */
@@ -763,13 +808,13 @@ function sylEN(w){w=w.toLowerCase().replace(/[^a-z]/g,'');if(!w)return 0;if(w.le
 const sylSN=w=>(w.toLowerCase().match(/[aeiou]/g)||[]).length;
 const sylOf=line=>(line.match(/[\p{L}']+/gu)||[]).reduce((a,w)=>a+(P.lang==='sn'?sylSN(w):sylEN(w)),0);
 const sname=x=>x.split(',')[0].trim();
-function auth(a){const p=a.split(';').map(x=>x.trim()).filter(Boolean);if(p.length<2)return p[0]||'';return P.cs==='apa'?p.slice(0,-1).join(', ')+', & '+p[p.length-1]:p.slice(0,-1).join(', ')+' and '+p[p.length-1]}
-function citeOf(r){const p=r.a.split(';').map(x=>x.trim()).filter(Boolean);const n=p.length>2?sname(p[0])+' et al.':p.length===2?sname(p[0])+(P.cs==='apa'?' & ':' and ')+sname(p[1]):sname(p[0]||'Anon');return '('+n+(P.cs==='apa'?', ':' ')+(r.y||'n.d.')+')'}
+function auth(a){const p=a.split(';').map(x=>x.trim()).filter(Boolean);if(p.length<2)return p[0]||'';return P.cs==='apa'?p.slice(0,-1).join(', ')+', & '+p[p.length-1]:p.slice(0,-1).join(', ')+' '+trs('and')+' '+p[p.length-1]}
+function citeOf(r){const p=r.a.split(';').map(x=>x.trim()).filter(Boolean);const n=p.length>2?sname(p[0])+' '+trs('et al.'):p.length===2?sname(p[0])+(P.cs==='apa'?' & ':' '+trs('and')+' ')+sname(p[1]):sname(p[0]||trs('Anon'));return '('+n+(P.cs==='apa'?', ':' ')+(r.y||trs('n.d.'))+')'}
 function refHtml(r){
-  const A=esc(auth(r.a)||'Anon'),y=esc(r.y||'n.d.'),T=esc(r.t),S=esc(r.s||''),I=x=>'<i>'+x+'</i>',U=esc(r.u||''),
+  const A=esc(auth(r.a)||trs('Anon')),y=esc(r.y||trs('n.d.')),T=esc(r.t),S=esc(r.s||''),I=x=>'<i>'+x+'</i>',U=esc(r.u||''),
     head=P.cs==='apa'?A+' ('+y+'). ':A+' '+y+'. ';
   if(r.k==='article')return head+(P.cs==='apa'?T+'. ':'\u2018'+T+'\u2019, ')+I(S)+(r.d?', '+esc(r.d):'')+'.';
-  if(r.k==='web')return head+I(T)+'. '+(S?S+'. ':'')+(P.cs==='apa'?U:'Available at: '+U+' (Accessed: '+new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'})+').');
+  if(r.k==='web')return head+I(T)+'. '+(S?S+'. ':'')+(P.cs==='apa'?U:trs('Available at:')+' '+U+' ('+trs('Accessed:')+' '+new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'})+').');
   return head+I(T)+'. '+S+'.';
 }
 function renderSide(){
@@ -778,27 +823,27 @@ function renderSide(){
   $('#sidetitle').textContent=T;
   if(sideKind==='toc'){
     const hs=[...ed.querySelectorAll('h1,h2,h3,h4')];
-    body.innerHTML=hs.length?hs.map((x,i)=>'<button class="tocr l'+x.tagName[1]+'" data-i="'+i+'">'+esc(x.textContent||'(empty heading)')+'</button>').join(''):'<div class="note">No headings yet. Use Styles to add Heading 1 to 4 and they will appear here.</div>';
+    body.innerHTML=hs.length?hs.map((x,i)=>'<button data-u class="tocr l'+x.tagName[1]+'" data-i="'+i+'">'+esc(x.textContent||trs('(empty heading)'))+'</button>').join(''):'<div class="note">No headings yet. Use Styles to add Heading 1 to 4 and they will appear here.</div>';
     body.onclick=e=>{const b=e.target.closest('.tocr');if(b)jump(hs[+b.dataset.i])};
   }else if(sideKind==='scenes'){
     const ss=[...ed.querySelectorAll('.s-h')].filter(x=>x.textContent.trim());
-    body.innerHTML=ss.length?ss.map((x,i)=>'<button class="tocr" data-i="'+i+'">'+(i+1)+'. '+esc(x.textContent.trim().toUpperCase())+'</button>').join(''):'<div class="note">No scenes yet. Set a line to Scene Heading, like INT. KITCHEN - DAY.</div>';
+    body.innerHTML=ss.length?ss.map((x,i)=>'<button data-u class="tocr" data-i="'+i+'">'+(i+1)+'. '+esc(x.textContent.trim().toUpperCase())+'</button>').join(''):'<div class="note">No scenes yet. Set a line to Scene Heading, like INT. KITCHEN - DAY.</div>';
     body.onclick=e=>{const b=e.target.closest('.tocr');if(b)jump(ss[+b.dataset.i])};
   }else if(sideKind==='entries'){
     const js=[...ed.querySelectorAll('.jd')];
-    body.innerHTML=js.length?js.map((x,i)=>'<button class="tocr" data-i="'+i+'">'+esc(x.textContent)+'</button>').join(''):'<div class="note">No entries yet. Tap Today to add one.</div>';
+    body.innerHTML=js.length?js.map((x,i)=>'<button data-u class="tocr" data-i="'+i+'">'+esc(x.textContent)+'</button>').join(''):'<div class="note">No entries yet. Tap Today to add one.</div>';
     body.onclick=e=>{const b=e.target.closest('.tocr');if(b)jump(js[+b.dataset.i])};
   }else if(sideKind==='syl'){
     const G=[{n:'',l:[]}];
     [...ed.childNodes].forEach(k=>{const tx=(k.textContent||'').replace(/\u00a0/g,' ').trim();if(!tx)return;if(k.classList&&k.classList.contains('sec'))G.push({n:tx,l:[]});else G[G.length-1].l.push(tx)});
     let html='<div class="seg"><button data-lang="en" class="'+(P.lang==='en'?'on':'')+'">English</button><button data-lang="sn" class="'+(P.lang==='sn'?'on':'')+'">Shona / Chewa</button></div>';
     const any=G.some(g=>g.l.length);
-    G.forEach(g=>{if(!g.l.length&&!g.n)return;if(g.n)html+='<div class="sh">'+esc(g.n)+' \u00b7 '+g.l.length+(g.l.length===1?' line':' lines')+'</div>';g.l.forEach(l=>{html+='<div class="sl"><b>'+sylOf(l)+'</b><span>'+esc(l)+'</span></div>'})});
+    G.forEach(g=>{if(!g.l.length&&!g.n)return;if(g.n)html+='<div data-u class="sh">'+esc(g.n)+' \u00b7 '+trf(g.l.length===1?'{n} line':'{n} lines',{n:g.l.length})+'</div>';g.l.forEach(l=>{html+='<div data-u class="sl"><b>'+sylOf(l)+'</b><span>'+esc(l)+'</span></div>'})});
     if(!any)html+='<div class="note">Write a few lines and their syllable counts will show here.</div>';
     body.innerHTML=html+'<div class="note">Counts are estimates. English uses common spelling rules; Shona and Chewa count vowels.</div>';
     body.onclick=e=>{const b=e.target.closest('[data-lang]');if(b){P.lang=b.dataset.lang;apply();renderSide()}};
   }else if(sideKind==='refs'){
-    const rows=refs.map((r,i)=>'<div class="rr"><span>'+esc(citeOf(r))+' \u2013 '+esc(r.t)+'</span><button data-cite="'+i+'">Cite</button><button data-del="'+i+'" aria-label="Remove">&times;</button></div>').join('');
+    const rows=refs.map((r,i)=>'<div class="rr"><span data-u>'+esc(citeOf(r))+' \u2013 '+esc(r.t)+'</span><button data-cite="'+i+'">Cite</button><button data-del="'+i+'" aria-label="Remove">&times;</button></div>').join('');
     body.innerHTML='<div class="seg"><button data-cs="apa" class="'+(P.cs==='apa'?'on':'')+'">APA 7</button><button data-cs="harvard" class="'+(P.cs==='harvard'?'on':'')+'">Harvard</button></div>'+
       '<div class="rf"><select id="rt"><option value="book">Book</option><option value="article">Journal article</option><option value="web">Website</option></select><input id="ra" placeholder="Author(s): Surname, I.; Surname, I."><input id="ry" placeholder="Year"><input id="rtl" placeholder="Title"><input id="rs" placeholder="Publisher, journal or website name"><input id="rd" placeholder="Volume(issue), pages (articles)"><input id="ru" placeholder="Link (websites)"><button id="radd" class="rb">Add source</button></div>'+
       '<div class="sh">Your sources</div>'+(rows||'<div class="note">No sources yet.</div>')+(refs.length?'<button id="rins" class="rb ghost">Insert reference list at cursor</button>':'');
@@ -809,7 +854,7 @@ function renderSide(){
       if(t.dataset.del){refs.splice(+t.dataset.del,1);queue();renderSide();return}
       if(t.dataset.cite){const c=citeOf(refs[+t.dataset.cite]);closeSide();restoreSel();document.execCommand('insertText',false,c);queue();return}
       if(t.id==='rins'){const list=[...refs].sort((x,y)=>(auth(x.a)).localeCompare(auth(y.a)));closeSide();restoreSel();
-        document.execCommand('insertHTML',false,'<h2>References</h2>'+list.map(r=>'<div class="ref">'+refHtml(r)+'</div>').join('')+'<div><br></div>');queue()}
+        document.execCommand('insertHTML',false,'<h2>'+esc(trs('References'))+'</h2>'+list.map(r=>'<div class="ref">'+refHtml(r)+'</div>').join('')+'<div><br></div>');queue()}
     };
   }
 }
