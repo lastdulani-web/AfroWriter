@@ -105,8 +105,9 @@ footer{display:flex;justify-content:center;align-items:center;gap:10px}
 .lab #mode{border:0;background:var(--paper);height:100%;font-weight:600}
 select option{background:var(--paper);color:var(--ink)}
 #bar svg{display:block}
-#picker{position:fixed;inset:0;z-index:15;background:#0009;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,sans-serif}
-#picker[hidden]{display:none}
+#picker,#welcome{position:fixed;inset:0;z-index:15;background:#0009;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,sans-serif}
+#picker[hidden],#welcome[hidden]{display:none}
+#welcome{z-index:16}
 .pk{background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:100%;max-width:440px;padding:16px;max-height:100%;overflow-y:auto}
 .pkh{display:flex;align-items:center;margin-bottom:12px}
 .pkh b{flex:1;font-size:18px}
@@ -163,6 +164,15 @@ body[data-mode=script] .page{max-width:640px}
 #ed .s-p{padding:0 22% 0 28%;margin:0}
 #ed .s-p:before{content:"("}#ed .s-p:after{content:")"}
 #ed .s-t{text-align:right;text-transform:uppercase;margin:1em 0}
+.card[hidden]{display:none}
+.cards .card:last-child:nth-child(odd){grid-column:1/-1}
+.card.lang{min-height:58px;justify-content:center}
+.card.lang.sel{border-color:var(--pop)}
+.wh{margin-bottom:14px}
+.wh b{display:block;font-size:20px;margin-bottom:4px}
+.wh span{color:var(--mute);font-size:15px}
+#soon{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);border-left:4px solid var(--pop);font-size:14px}
+#soon[hidden]{display:none}
 @media(max-width:600px){#ed .s-c{padding-left:26%}#ed .s-d{padding:0 8% 0 12%}#ed .s-p{padding:0 14% 0 20%}}
 @media(max-width:600px){
 #tabs:has(.tab:only-of-type){display:none}
@@ -193,7 +203,7 @@ body.focus #editrow{display:none}
 }
 @media(prefers-reduced-motion:reduce){#bar,#editbtn .chev{transition:none}}
 @media print{
-#editrow,#picker,#thesis,#findbar,#side{display:none!important}
+#editrow,#picker,#welcome,#thesis,#findbar,#side{display:none!important}
 #splash{display:none!important}
 :root,:root:not([data-theme=light]),:root[data-theme=dark],:root[data-theme=light]{--paper:#fff;--ink:#000;--mute:#444;--line:#bbb;--bg:#fff;--pop:#444}
 header,#bar,#tabs,footer,#docs{display:none!important}
@@ -310,6 +320,19 @@ main{overflow:visible;padding:0}
   </div>
 </main>
 <footer><button id="state" aria-label="Draft. Tap to mark as finished">Draft</button><span id="saved"><i id="dot"></i><span id="fstat">Saved</span></span><span id="count">0 words</span></footer>
+<div id="welcome" role="dialog" aria-label="Welcome">
+  <div class="pk">
+    <div class="wh"><b>Hi, welcome to AfroWriter.</b><span>Which language do you prefer?</span></div>
+    <div class="cards">
+      <button class="card lang" data-lg="en"><b>English</b></button>
+      <button class="card lang" data-lg="sn"><b>Shona</b></button>
+      <button class="card lang" data-lg="nd"><b>Ndebele</b></button>
+      <button class="card lang" data-lg="ny"><b>Chewa</b></button>
+      <button class="card lang" data-lg="to"><b>Tonga</b></button>
+    </div>
+    <div id="soon" role="status" hidden></div>
+  </div>
+</div>
 <div id="picker" hidden>
   <div class="pk" role="dialog" aria-label="What are you writing?">
     <div class="pkh"><b>What are you writing?</b><button id="pkclose" aria-label="Close">&times;</button></div>
@@ -320,6 +343,7 @@ main{overflow:visible;padding:0}
       <button class="card" data-m="essay"><b>Essay</b><span>Structured writing with a word goal and double spacing.</span></button>
       <button class="card" data-m="journal"><b>Journal</b><span>Daily entries with the date added for you, plus a mood tag.</span></button>
       <button class="card" data-m="script"><b>Script</b><span>Screenplays and stage scripts, with scene headings and dialogue, in Courier.</span></button>
+      <button class="card" data-m="last" id="lastcard" hidden><b>Take me to my last document</b><span id="lastinfo"></span></button>
     </div>
   </div>
 </div>
@@ -390,7 +414,7 @@ $('#bar').addEventListener('click',e=>{
   ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);queue();
 });
 function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);const vw={sc:lib.docs[id].sc,c:lib.docs[id].c};if(!lib.open.includes(id))lib.open.push(id);setMode(mode,true);words();save();renderTabs();paintState();scrollTo(0,0);restoreView(vw)}
-function newPiece(){closeDocs();$('#picker').hidden=false}
+function newPiece(){closeDocs();$('#lastcard').hidden=true;$('#picker').hidden=false}
 function makePiece(m){
   clearTimeout(t);save();
   const c=lib.docs[lib.cur];
@@ -480,7 +504,7 @@ function seedScript(){if(ed.innerText.trim()||ed.querySelector('[class^=s-]'))re
 function setMode(m,init){mode=m;document.body.dataset.mode=m;$('#mode').value=m;words();if(m==='journal'&&!init&&!ed.innerText.trim())insertToday();if(m==='script'&&!init)seedScript();if(!init)queue()}
 $('#mode').addEventListener('change',e=>setMode(e.target.value));
 $('#focus').addEventListener('click',e=>{const on=document.body.classList.toggle('focus');e.currentTarget.setAttribute('aria-pressed',on)});
-setMode(mode,true);renderTabs();paintState();if(firstRun)$('#picker').hidden=false;
+setMode(mode,true);renderTabs();paintState();
 mq.addEventListener&&mq.addEventListener('change',paintTheme);
 const enc=new TextEncoder();
 const CT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
@@ -576,9 +600,29 @@ $('#exp').addEventListener('change',e=>{const v=e.target.value;e.target.selected
 const sp=$('#splash');
 function hideSplash(){sp.classList.add('out');setTimeout(()=>sp.remove(),500)}
 try{if(sessionStorage.getItem('afrowriter:splash'))sp.remove();else{sessionStorage.setItem('afrowriter:splash','1');setTimeout(hideSplash,1600);sp.onclick=hideSplash}}catch(e){setTimeout(hideSplash,1600)}
+/* ---------- Welcome screen ---------- */
+function lastDoc(){
+  const full=i=>{const d=lib.docs[i];return !!((d.t||'').trim()||(d.h||'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').trim())};
+  const ids=Object.keys(lib.docs).filter(full);
+  if(!ids.length)return null;
+  return ids.includes(lib.cur)?lib.cur:ids.sort((a,b)=>lib.docs[b].at-lib.docs[a].at)[0]
+}
+const LANGS={sn:'Shona',nd:'Ndebele',ny:'Chewa',to:'Tonga'};
+$('#welcome').addEventListener('click',e=>{
+  const c=e.target.closest('.lang');if(!c)return;
+  const code=c.dataset.lg,soon=$('#soon');
+  document.querySelectorAll('#welcome .lang').forEach(x=>x.classList.toggle('sel',x===c&&code!=='en'));
+  if(code!=='en'){soon.textContent=LANGS[code]+' is coming soon. Please choose English for now.';soon.hidden=false;return}
+  soon.hidden=true;$('#welcome').hidden=true;
+  const id=lastDoc(),lc=$('#lastcard');lc.hidden=!id;
+  if(id){const d=lib.docs[id];$('#lastinfo').textContent=(d.t.trim()||'Untitled')+' \u00b7 '+d.m[0].toUpperCase()+d.m.slice(1)+' \u00b7 '+ago(d.at)}
+  $('#picker').hidden=false;
+});
 $('#picker').addEventListener('click',e=>{
   if(e.target.id==='picker'||e.target.closest('#pkclose')){$('#picker').hidden=true;return}
-  const c=e.target.closest('.card');if(c)makePiece(c.dataset.m);
+  const c=e.target.closest('.card');if(!c)return;
+  if(c.dataset.m==='last'){const id=lastDoc();$('#picker').hidden=true;if(id&&id!==lib.cur)openDoc(id);return}
+  makePiece(c.dataset.m);
 });
 function restoreSel(){ed.focus();if(rng){const s=getSelection();s.removeAllRanges();s.addRange(rng)}}
 $('#list').addEventListener('change',e=>{const s=e.target;restoreSel();document.execCommand(s.value,false,null);s.selectedIndex=0;queue()});
