@@ -632,13 +632,28 @@ function buildDocx(root,ttl,md,dbl,fam){
 }
 
 function slug(){return(title.value.trim()||'AfroWriter').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').slice(0,60)||'AfroWriter'}
-function doDocx(){
+async function doDocx(){
   clearTimeout(t);save();
   const first=mode==='script'?'Courier New':P.f.split(',')[0].replace(/['"]/g,'').trim();
   const blob=buildDocx(ed,title.value.trim(),mode,!!P.dbl,/system-ui/.test(first)?'Calibri':first);
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=slug()+'.docx';
-  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-  st.textContent='Word file ready'
+  const name=slug()+'.docx',type=blob.type;
+  try{
+    if(window.showSaveFilePicker){
+      /* PC browsers and the desktop app: a real "Save as" window */
+      const fh=await window.showSaveFilePicker({suggestedName:name,types:[{description:'Word document',accept:{[type]:['.docx']}}]});
+      const w=await fh.createWritable();await w.write(blob);await w.close();
+    }else{
+      const file=new File([blob],name,{type});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        /* phones: the share sheet, which has "Save to Files" on iPhone */
+        await navigator.share({files:[file],title:title.value.trim()||'AfroWriter'});
+      }else{
+        const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+        document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+      }
+    }
+    st.textContent='Word file ready'
+  }catch(e){if(e&&e.name==='AbortError')return;st.textContent='Could not save: storage full or blocked'}
 }
 function doPdf(){
   clearTimeout(t);save();const old=document.title;document.title=title.value.trim()||'AfroWriter';
