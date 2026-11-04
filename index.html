@@ -21,7 +21,7 @@
 html,body{height:100%;margin:0}
 body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,"Iowan Old Style",serif}
 header{background:var(--brand);color:#fff;display:flex;align-items:center;gap:8px;padding:8px 10px;font-family:system-ui,sans-serif}
-header .logo{flex:none;width:38px;height:38px;border-radius:10px;display:block;object-fit:contain;background:#fcfcff}
+header .logo{flex:none;width:38px;height:38px;border-radius:10px;display:block;object-fit:contain;background:transparent;box-shadow:0 0 0 1px #ffffff33}
 header b{font-size:16px;letter-spacing:.2px}
 .brand{display:flex;flex-direction:column;line-height:1.15;flex:none}
 .brand small{font-size:10px;color:#fff;font-weight:400;letter-spacing:.2px;white-space:nowrap}
@@ -95,6 +95,7 @@ footer{display:flex;justify-content:center;align-items:center;gap:10px}
 #splash b{font-size:26px;letter-spacing:.2px}
 #splash i{color:#ff9bbd;font-style:normal}
 #splash span{font-size:14px;opacity:.85}
+#splash .tag{font-style:normal;font-size:16px;color:#ff9bbd;margin-top:-4px}
 #splash.out{opacity:0;pointer-events:none}
 @media(prefers-reduced-motion:reduce){#splash{transition:none}}
 .credit{padding:10px 14px;font-size:12px;color:var(--mute);text-align:center;border-top:1px solid var(--line)}
@@ -354,7 +355,7 @@ main{overflow:visible;padding:0}
   </div>
 </div>
 <div id="side" hidden><div class="sheet" role="dialog"><div class="dh"><b id="sidetitle"></b><button id="sideclose" aria-label="Close">&times;</button></div><div id="sidebody"></div></div></div>
-<div id="splash" aria-hidden="true"><img src="logo-badge.png" alt="" width="96" height="96"><b>Afro<i>Writer</i></b><span>Developed by Last Dulani</span></div>
+<div id="splash" aria-hidden="true"><img src="logo-badge.png" alt="" width="120" height="120"><b>Afro<i>Writer</i></b><em class="tag">Write beautifully. Create freely.</em><span>Developed by Last Dulani</span></div>
 <div id="docs" hidden>
   <div class="sheet" role="dialog" aria-label="Documents">
     <div class="dh"><b>My documents</b><button id="dnew">+ New piece</button><button id="dclose" aria-label="Close">&times;</button></div>
