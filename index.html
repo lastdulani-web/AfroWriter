@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="author" content="Last Dulani">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fcfcff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1a1c2e" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#2b2a6b" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#2b2a6b" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="AfroWriter">
 <title>AfroWriter</title>
 <link rel="manifest" href="manifest.json">
@@ -25,24 +25,24 @@
 @font-face{font-family:Outfit;src:url(fonts/outfit-700.woff) format("woff");font-weight:700;font-style:normal;font-display:swap}
 @font-face{font-family:"Plus Jakarta Sans";src:url(fonts/jakarta-400.woff) format("woff");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:"Plus Jakarta Sans";src:url(fonts/jakarta-700.woff) format("woff");font-weight:700;font-style:normal;font-display:swap}
-:root{--splash:#f2f1fb;--glowc:43,42,107;--ef:Gelasio,Georgia,'Iowan Old Style',serif;--brand:#2b2a6b;--pop:#d93a73;--paper:#fcfcff;--ink:#1c1d33;--mute:#6a6d8c;--line:#dcdeee;--bg:#e9eaf4}
+:root{--splash:#f2f1fb;--glowc:43,42,107;--ef:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--tf:Gelasio,Georgia,'Iowan Old Style',serif;--brand:#2b2a6b;--pop:#d93a73;--paper:#fcfcff;--ink:#1c1d33;--mute:#6a6d8c;--line:#dcdeee;--bg:#e9eaf4}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--splash:#15162b;--glowc:190,180,255;--paper:#1a1c2e;--ink:#e9eaf5;--mute:#a0a4c4;--line:#2b2e48;--bg:#11121f}}
 :root[data-theme=dark]{--splash:#15162b;--glowc:190,180,255;--paper:#1a1c2e;--ink:#e9eaf5;--mute:#a0a4c4;--line:#2b2e48;--bg:#11121f}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
-#theme,#focus,#docsbtn{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;width:34px;height:30px;display:grid;place-items:center;padding:0}
+#theme,#focus,#docsbtn{background:none;border:1px solid rgba(255,255,255,.38);color:#fff;border-radius:8px;width:34px;height:30px;display:grid;place-items:center;padding:0}
 #theme svg,#focus svg,#docsbtn svg{width:18px;height:18px}#focus[aria-pressed=true]{background:var(--pop);border-color:var(--pop)}#theme:focus-visible,#focus:focus-visible,#docsbtn:focus-visible{outline:2px solid var(--pop);outline-offset:1px}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,"Iowan Old Style",serif}
-header{background:var(--paper);color:var(--ink);display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:3px solid var(--pop);font-family:system-ui,sans-serif}
+header{background:var(--brand);color:#fff;display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:3px solid var(--pop);font-family:system-ui,sans-serif}
 header .logo{flex:none;width:40px;height:40px;border-radius:11px;display:block;object-fit:contain;background:transparent;box-shadow:0 0 0 1.5px rgba(217,58,115,.6)}
-header b{font-size:15px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
+header b{font-size:15px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;color:#f3f1ff}
 .brand{display:flex;flex-direction:column;line-height:1.15;flex:none;min-width:0}
 .brand small{display:none}
 @media(max-width:400px){#status{display:none}}
 header b i{color:#ff9bbd;font-style:normal}
-#status{margin-left:auto;font-size:12px;color:var(--mute);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#newdoc{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:5px 11px;font:13px system-ui,sans-serif}
+#status{margin-left:auto;font-size:12px;color:rgba(255,255,255,.75);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#newdoc{background:none;border:1px solid rgba(255,255,255,.38);color:#fff;border-radius:8px;padding:5px 11px;font:13px system-ui,sans-serif}
 #bar{display:flex;gap:4px;overflow-x:auto;padding:6px 8px;background:var(--paper);border-bottom:1px solid var(--line);font-family:system-ui,sans-serif}
 #bar button{flex:none;min-width:40px;height:38px;border:0;border-radius:8px;background:none;color:var(--ink);font-size:15px}
 #bar button:active,#bar button.on{background:var(--pop);color:#fff}
@@ -50,10 +50,11 @@ header b i{color:#ff9bbd;font-style:normal}
 .sep{flex:none;width:1px;background:var(--line);margin:4px 4px}
 main{flex:1;overflow-y:auto;padding:14px 10px calc(14px + env(safe-area-inset-bottom))}
 .page{max-width:720px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:4px;min-height:100%;padding:22px 20px}
-#title{width:100%;border:0;background:none;color:var(--ink);font-weight:700;font-size:26px;line-height:1.25;font-family:var(--ef);outline:none;padding:0 0 10px;border-bottom:3px solid var(--pop);margin-bottom:14px}
+#title{width:100%;border:0;background:none;color:var(--ink);font-weight:700;font-size:26px;line-height:1.25;font-family:var(--tf);outline:none;padding:0 0 10px;border-bottom:3px solid var(--pop);margin-bottom:14px}
 #ed{outline:none;min-height:50vh;word-wrap:break-word;font-family:var(--ef);font-size:var(--es,17px)}
 #font,#styles,#size,#mode,#exp,#list,#case,#sec,#mood,#elem{flex:none;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:14px system-ui,sans-serif;padding:0 6px}
 #ed:empty:before{content:attr(data-ph);color:var(--mute)}
+#ed h1,#ed h2,#ed h3,#ed h4{font-family:var(--tf)}
 #ed h1{font-size:1.4em;line-height:1.3;margin:1em 0 .3em}
 #ed h2{font-size:1.18em;line-height:1.3;margin:1em 0 .3em}
 #ed h3{font-size:1.06em;line-height:1.35;margin:.9em 0 .3em}
@@ -119,6 +120,7 @@ footer{display:flex;justify-content:center;align-items:center;gap:10px}
 @media(prefers-reduced-motion:reduce){#splash{transition:none}}
 .credit{padding:10px 14px;font-size:12px;color:var(--mute);text-align:center;border-top:1px solid var(--line)}
 .lab{flex:none;display:flex;align-items:center;gap:2px;height:38px;border:1px solid var(--line);border-radius:8px;padding-left:9px;background:var(--paper);font:700 11px system-ui,sans-serif;letter-spacing:.08em;color:var(--mute)}
+.lab #font,.lab #tfont{border:0;background:var(--paper);height:100%;font-weight:600;width:auto;max-width:150px}
 .lab #mode{border:0;background:var(--paper);height:100%;font-weight:600}
 select option{background:var(--paper);color:var(--ink)}
 #bar svg{display:block}
@@ -193,7 +195,7 @@ main{padding:0 0 calc(10px + env(safe-area-inset-bottom))}
 #bar .sep{display:none}
 #bar button{height:34px;min-width:34px;padding:0 8px}
 #font,#styles,#size,#mode,#exp,#list,#case,#sec,#mood,#elem{height:34px;font-size:13px;padding:0 2px 0 5px}
-#elem{width:112px}#sec{width:84px}#mood{width:72px}#mode{width:78px}#styles{width:80px}#list{width:58px}#font{width:112px}#size{width:50px}#case{width:52px}#exp{width:70px}
+#elem{width:112px}#sec{width:84px}#mood{width:72px}#mode{width:78px}#styles{width:80px}#list{width:58px}#font{width:118px}#tfont{width:98px}#size{width:50px}#case{width:52px}#exp{width:70px}
 .lab{height:34px}
 #bar button{min-width:36px}
 #bar button{padding:0 6px;min-width:32px}
@@ -213,7 +215,7 @@ body.focus #editrow{display:none}
 }
 @media(prefers-reduced-motion:reduce){#bar,#editbtn .chev{transition:none}}
 body{padding-top:env(safe-area-inset-top,0px)}
-body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--paper);z-index:40}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--brand);z-index:40}
 @supports (-webkit-touch-callout:none){
 header{padding-top:26px}
 #docs,#side{inset:calc(env(safe-area-inset-top,0px) + 77px) 0 0 0}
@@ -288,20 +290,15 @@ main{overflow:visible;padding:0}
   <button data-c="bold" aria-label="Bold"><b>B</b></button>
   <button data-c="italic" aria-label="Italic"><i>I</i></button>
   <button data-c="underline" aria-label="Underline"><u>U</u></button>
-  <select id="font" aria-label="Font">
-    <optgroup label="Serif">
-      <option value="Gelasio,Georgia,'Iowan Old Style',serif" style="font-family:Gelasio,Georgia,serif">Gelasio</option>
-      <option value="Cardo,Georgia,'Iowan Old Style',serif" style="font-family:Cardo,Georgia,serif">Cardo</option>
-      <option value="'Crimson Text',Georgia,'Iowan Old Style',serif" style="font-family:'Crimson Text',Georgia,serif">Crimson Text</option>
-    </optgroup>
-    <optgroup label="Sans">
-      <option value="Outfit,system-ui,-apple-system,'Segoe UI',sans-serif" style="font-family:Outfit,system-ui,sans-serif">Outfit</option>
-      <option value="'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif">Plus Jakarta Sans</option>
-    </optgroup>
-    <optgroup label="Typewriter">
-      <option value="'Courier New',Courier,monospace" style="font-family:'Courier New',Courier,monospace">Courier</option>
-    </optgroup>
-  </select>
+  <label class="lab"><span>Title</span><select id="tfont" aria-label="Title font (serif)">
+    <option value="Gelasio,Georgia,'Iowan Old Style',serif" style="font-family:Gelasio,Georgia,serif">Gelasio</option>
+    <option value="Cardo,Georgia,'Iowan Old Style',serif" style="font-family:Cardo,Georgia,serif">Cardo</option>
+    <option value="'Crimson Text',Georgia,'Iowan Old Style',serif" style="font-family:'Crimson Text',Georgia,serif">Crimson Text</option>
+  </select></label>
+  <label class="lab"><span>Body</span><select id="font" aria-label="Body font (sans serif)">
+    <option value="'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif">Plus Jakarta Sans</option>
+    <option value="Outfit,system-ui,-apple-system,'Segoe UI',sans-serif" style="font-family:Outfit,system-ui,sans-serif">Outfit</option>
+  </select></label>
   <select id="size" aria-label="Text size">
     <option value="12">12</option>
     <option value="13">13</option>
@@ -499,13 +496,15 @@ $('#styles').addEventListener('change',e=>{
   if(rng){const s=getSelection();s.removeAllRanges();s.addRange(rng)}
   document.execCommand('formatBlock',false,sel.value);sel.selectedIndex=0;queue();
 });
-const PK='afrowriter:prefs',fs=$('#font');
-let P={f:fs.value,s:17,auto:true,lang:'en',cs:'apa'};
+const PK='afrowriter:prefs',fs=$('#font'),tfs=$('#tfont');
+let P={f:fs.value,tf:tfs.value,s:17,auto:true,lang:'en',cs:'apa'};
 try{P=Object.assign(P,JSON.parse(localStorage.getItem(PK)||'{}'))}catch(e){}
 if(![...fs.options].some(o=>o.value===P.f))P.f=fs.options[0].value;
+if(![...tfs.options].some(o=>o.value===P.tf))P.tf=tfs.options[0].value;
 function apply(){
-  const r=document.documentElement.style;r.setProperty('--ef',P.f);r.setProperty('--es',P.s+'px');
+  const r=document.documentElement.style;r.setProperty('--ef',P.f);r.setProperty('--tf',P.tf);r.setProperty('--es',P.s+'px');
   if([...fs.options].some(o=>o.value===P.f))fs.value=P.f;
+  if([...tfs.options].some(o=>o.value===P.tf))tfs.value=P.tf;
   if(P.theme)document.documentElement.dataset.theme=P.theme;
   document.body.classList.toggle('dbl',!!P.dbl);document.body.classList.toggle('pc',!!P.center);$('#auto').setAttribute('aria-pressed',!!P.auto);$('#ctr').setAttribute('aria-pressed',!!P.center);const db=$('#dbl');if(db)db.setAttribute('aria-pressed',!!P.dbl);
   if(typeof paintTheme==='function')paintTheme();
@@ -520,6 +519,7 @@ function isDark(){const t=document.documentElement.dataset.theme;return t?t==='d
 function paintTheme(){const d=isDark();tb.innerHTML=d?ICON.sun:ICON.moon;tb.setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode')}
 tb.addEventListener('click',()=>{P.theme=isDark()?'light':'dark';apply()});
 fs.addEventListener('change',()=>{P.f=fs.value;apply()});
+tfs.addEventListener('change',()=>{P.tf=tfs.value;apply()});
 apply();
 function seedScript(){if(ed.innerText.trim()||ed.querySelector('[class^=s-]'))return;ed.innerHTML='<div class="s-h"><br></div>';const d=ed.firstChild,r=document.createRange();r.setStart(d,0);r.collapse(true);const s=getSelection();s.removeAllRanges();s.addRange(r)}
 function setMode(m,init){mode=m;document.body.dataset.mode=m;$('#mode').value=m;words();if(m==='journal'&&!init&&!ed.innerText.trim())insertToday();if(m==='script'&&!init)seedScript();if(!init)queue()}
@@ -550,7 +550,7 @@ function zip(files){
 }
 const XE=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 function wrun(text,f){
-  const rp=(f.b?'<w:b/>':'')+(f.i?'<w:i/>':'')+(f.caps?'<w:caps/>':'')+(f.color?'<w:color w:val="'+f.color+'"/>':'')+(f.sz?'<w:sz w:val="'+f.sz+'"/>':'')+(f.u?'<w:u w:val="single"/>':'');
+  const rp=(f.fn?'<w:rFonts w:ascii="'+XE(f.fn)+'" w:hAnsi="'+XE(f.fn)+'" w:cs="'+XE(f.fn)+'"/>':'')+(f.b?'<w:b/>':'')+(f.i?'<w:i/>':'')+(f.caps?'<w:caps/>':'')+(f.color?'<w:color w:val="'+f.color+'"/>':'')+(f.sz?'<w:sz w:val="'+f.sz+'"/>':'')+(f.u?'<w:u w:val="single"/>':'');
   return '<w:r>'+(rp?'<w:rPr>'+rp+'</w:rPr>':'')+'<w:t xml:space="preserve">'+XE(f.up?text.toUpperCase():text)+'</w:t></w:r>';
 }
 function wruns(node,fmt,out){
@@ -569,17 +569,17 @@ function wruns(node,fmt,out){
 }
 const wpara=(inner,pp)=>'<w:p>'+(pp?'<w:pPr>'+pp+'</w:pPr>':'')+inner+'</w:p>';
 function wblock(n,f,out){if(n.childNodes.length===1&&n.childNodes[0].tagName==='BR')return;wruns(n,f,out)}
-function buildDocx(root,ttl,md,dbl,fam){
+function buildDocx(root,ttl,md,dbl,fam,tfam){
   const sp=md==='essay'?(dbl?'<w:spacing w:after="0" w:line="480" w:lineRule="auto"/>':'<w:spacing w:after="160" w:line="360" w:lineRule="auto"/>'):md==='prose'?'<w:spacing w:after="0" w:line="360" w:lineRule="auto"/><w:ind w:firstLine="360"/>':'<w:spacing w:after="0" w:line="276" w:lineRule="auto"/>';
   const out=[];let cur=[];
-  if(ttl)out.push(wpara(wrun(ttl,{b:1,sz:44}),'<w:spacing w:after="280"/>'));
+  if(ttl)out.push(wpara(wrun(ttl,{b:1,sz:44,fn:tfam}),'<w:spacing w:after="280"/>'));
   const flush=()=>{if(cur.length){out.push(wpara(cur.join(''),sp));cur=[]}};
   root.childNodes.forEach(n=>{
     const blockTag=n.nodeType===1&&/^(DIV|P|H[1-4]|UL|OL)$/.test(n.tagName);
     if(!blockTag){wruns({childNodes:[n]},{},cur);return}
     flush();
     const tg=n.tagName,r=[];
-    if(/^H[1-4]$/.test(tg)){wblock(n,{b:1,i:tg==='H4'?1:0,sz:{H1:36,H2:30,H3:26,H4:24}[tg]},r);out.push(wpara(r.join(''),'<w:keepNext/><w:spacing w:before="240" w:after="80"/>'));return}
+    if(/^H[1-4]$/.test(tg)){wblock(n,{b:1,i:tg==='H4'?1:0,sz:{H1:36,H2:30,H3:26,H4:24}[tg],fn:tfam},r);out.push(wpara(r.join(''),'<w:keepNext/><w:spacing w:before="240" w:after="80"/>'));return}
     if(tg==='UL'||tg==='OL'){let k=0;n.childNodes.forEach(li=>{if(li.tagName!=='LI')return;k++;const r2=[];wruns(li,{},r2);out.push(wpara(wrun(tg==='UL'?'\u2022\t':k+'.\t',{})+r2.join(''),'<w:tabs><w:tab w:val="left" w:pos="540"/></w:tabs><w:spacing w:after="40"/><w:ind w:left="540" w:hanging="360"/>'))});return}
     const sm=String(n.className||'').match(/\bs-([hacdpt])\b/);
     if(sm){const t=sm[1],up=(t==='h'||t==='c'||t==='t')?1:0;wblock(n,{up:up,b:t==='h'?1:0},r);let inner=r.join('');
@@ -594,11 +594,14 @@ function buildDocx(root,ttl,md,dbl,fam){
   });
   flush();
   const W='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"',H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  const ALT={Outfit:['Calibri','swiss'],'Plus Jakarta Sans':['Calibri','swiss'],Gelasio:['Georgia','roman'],Cardo:['Palatino Linotype','roman'],'Crimson Text':['Garamond','roman']};
+  const ft=[fam,tfam].filter((x,i,a)=>x&&a.indexOf(x)===i).map(n=>{const a=ALT[n];return a?'<w:font w:name="'+XE(n)+'"><w:altName w:val="'+a[0]+'"/><w:family w:val="'+a[1]+'"/></w:font>':''}).join('');
   return zip([
-    {name:'[Content_Types].xml',data:H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>'},
+    {name:'[Content_Types].xml',data:H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/></Types>'},
     {name:'_rels/.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'},
-    {name:'word/_rels/document.xml.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+    {name:'word/_rels/document.xml.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/></Relationships>'},
     {name:'word/styles.xml',data:H+'<w:styles '+W+'><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="'+XE(fam)+'" w:hAnsi="'+XE(fam)+'" w:cs="'+XE(fam)+'"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:rPrDefault></w:docDefaults></w:styles>'},
+    {name:'word/fontTable.xml',data:H+'<w:fonts '+W+'>'+ft+'</w:fonts>'},
     {name:'word/document.xml',data:H+'<w:document '+W+'><w:body>'+out.join('')+'<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>'}
   ]);
 }
@@ -607,7 +610,8 @@ function slug(){return(title.value.trim()||'AfroWriter').replace(/[^\w\- ]+/g,''
 async function doDocx(){
   clearTimeout(t);save();
   const first=mode==='script'?'Courier New':P.f.split(',')[0].replace(/['"]/g,'').trim();
-  const blob=buildDocx(ed,title.value.trim(),mode,!!P.dbl,/system-ui/.test(first)?'Calibri':({Gelasio:'Georgia'}[first]||first));
+  const tfirst=P.tf.split(',')[0].replace(/['"]/g,'').trim();
+  const blob=buildDocx(ed,title.value.trim(),mode,!!P.dbl,/system-ui/.test(first)?'Calibri':first,tfirst);
   const name=slug()+'.docx',type=blob.type;
   try{
     if(window.showSaveFilePicker){
