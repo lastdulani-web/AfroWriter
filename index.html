@@ -220,7 +220,12 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area
 header{padding-top:26px}
 #docs,#side{inset:calc(env(safe-area-inset-top,0px) + 77px) 0 0 0}
 }
+.safe{padding:8px 12px 6px;border-top:1px solid var(--line)}
+.srow{display:flex;gap:6px}
+.srow button{flex:1;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;height:34px;font-size:13px}
+.snote{font-size:11.5px;color:var(--mute);margin:6px 2px 0}
 @media print{
+.safe{display:none!important}
 body::before{display:none}
 #editrow,#picker,#thesis,#findbar,#side{display:none!important}
 #splash{display:none!important}
@@ -368,10 +373,16 @@ main{overflow:visible;padding:0}
     <div class="dh"><b>My documents</b><button id="dnew">+ New piece</button><button id="dclose" aria-label="Close">&times;</button></div>
     <div class="flt"><button data-f="all" class="on">All</button><button data-f="draft">Drafts</button><button data-f="final">Finished</button></div>
     <div id="dlist"></div>
+    <div class="safe">
+      <div class="srow"><button id="bkbtn">Back up</button><button id="rsbtn">Restore</button><button id="rcbtn">Recovery</button></div>
+      <div class="snote" id="bkinfo"></div>
+    </div>
+    <input type="file" id="rfile" hidden>
     <div class="credit">AfroWriter &middot; <span>Developed by Last Dulani</span> &middot; v22<br>Fonts: Gelasio, Cardo, Crimson Text, Outfit, Plus Jakarta Sans &middot; SIL Open Font License</div>
   </div>
 </div>
 <script>
+(async()=>{
 const $=s=>document.querySelector(s), ed=$('#ed'), title=$('#title'), st={set textContent(v){const w=trs(v);$('#status').textContent=w;$('#fstat').textContent=w;$('#dot').className=/Saving/.test(v)?'busy':/Could not/.test(v)?'bad':''},get textContent(){return $('#status').textContent}}, K='afrowriter:doc';
 /* Text helpers. English only: the language system was removed on purpose and will be rebuilt. */
 const trs=s=>s;
@@ -387,6 +398,79 @@ function words(){
 }
 const LK='afrowriter:library',uid=()=>'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let lib={cur:null,docs:{}};
+
+/* ---------- Storage: an on-device database (IndexedDB). Nothing leaves this device. ---------- */
+let idb=null,useLS=false,flushing=false,again=false,pending=Promise.resolve(),metaFp='';
+const persisted={},lastSnap={},opened=new Set();
+const fp=d=>[d.at,d.t,d.m,d.g,d.s,d.o,JSON.stringify(d.r||[]),d.sc,d.c].join('|');
+function idbOpen(){return new Promise((res,rej)=>{
+  if(!window.indexedDB)return rej(new Error('no indexedDB'));
+  const q=indexedDB.open('afrowriter',1);
+  q.onupgradeneeded=()=>{const d=q.result;
+    if(!d.objectStoreNames.contains('docs'))d.createObjectStore('docs',{keyPath:'id'});
+    if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'k'});
+    if(!d.objectStoreNames.contains('snaps')){const s=d.createObjectStore('snaps',{keyPath:'sid',autoIncrement:true});s.createIndex('byDoc','id')}
+    if(!d.objectStoreNames.contains('trash'))d.createObjectStore('trash',{keyPath:'sid',autoIncrement:true});
+  };
+  q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);q.onblocked=()=>rej(new Error('blocked'));
+})}
+const idbReq=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const idbAll=s=>idbReq(idb.transaction(s).objectStore(s).getAll());
+const idbGet=(s,k)=>idbReq(idb.transaction(s).objectStore(s).get(k));
+function idbRun(stores,fn){return new Promise((res,rej)=>{const x=idb.transaction(stores,'readwrite');fn(x);x.oncomplete=()=>res();x.onerror=()=>rej(x.error);x.onabort=()=>rej(x.error)})}
+async function bootStore(){
+  try{
+    idb=await idbOpen();
+    const docs=await idbAll('docs'),meta=await idbGet('meta','state');
+    if(docs.length){docs.forEach(d=>{lib.docs[d.id]=d;persisted[d.id]=fp(d)});if(meta){lib.cur=meta.cur;lib.open=meta.open||[]}}
+    else{
+      let old=null;try{old=JSON.parse(localStorage.getItem(LK)||'null')}catch(e){}
+      if(old&&old.docs){lib=old;Object.keys(lib.docs).forEach(id=>{lib.docs[id].id=id})}   /* bring across what older versions saved */
+    }
+    if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+    purgeTrash();
+  }catch(e){
+    useLS=true;
+    try{const l=JSON.parse(localStorage.getItem(LK)||'null');if(l&&l.docs)lib=l}catch(_){}
+  }
+}
+function flush(){
+  if(useLS){try{localStorage.setItem(LK,JSON.stringify(lib));bufClear();return Promise.resolve()}catch(e){return Promise.reject(e)}}
+  if(flushing){again=true;return pending}
+  flushing=true;
+  pending=(async()=>{
+    try{
+      do{again=false;
+        const puts=[],dels=[];
+        for(const id of Object.keys(lib.docs)){const d=lib.docs[id];d.id=id;const f=fp(d);if(persisted[id]!==f)puts.push([id,d,f])}
+        for(const id of Object.keys(persisted))if(!lib.docs[id])dels.push(id);
+        const mf=(lib.cur||'')+'|'+(lib.open||[]).join(',');
+        if(puts.length||dels.length||mf!==metaFp){
+          await idbRun(['docs','meta'],x=>{const ds=x.objectStore('docs');puts.forEach(([id,d])=>ds.put(d));dels.forEach(id=>ds.delete(id));x.objectStore('meta').put({k:'state',cur:lib.cur,open:lib.open})});
+          puts.forEach(([id,,f])=>{persisted[id]=f});dels.forEach(id=>{delete persisted[id]});metaFp=mf;
+        }
+      }while(again);
+      bufClear();
+    }finally{flushing=false}
+  })();
+  return pending;
+}
+/* last-moment copy, so a killed app can still recover what you just typed */
+function bufWrite(){try{const d=lib.docs[lib.cur];if(!d)return;localStorage.setItem('afrowriter:buf',JSON.stringify({id:lib.cur,at:d.at,t:d.t,h:d.h,m:d.m,g:d.g,s:d.s,r:d.r,o:d.o}))}catch(e){}}
+function bufClear(){try{localStorage.removeItem('afrowriter:buf')}catch(e){}}
+/* ---------- Recovery: earlier versions and recently deleted pieces ---------- */
+const snapsFor=id=>idbReq(idb.transaction('snaps').objectStore('snaps').index('byDoc').getAll(IDBKeyRange.only(id)));
+async function snapDoc(d,why,id){
+  if(useLS||!idb||!d)return;
+  const rec={id:id||d.id||lib.cur,at:Date.now(),t:d.t,h:d.h,m:d.m,g:d.g,s:d.s,r:d.r,o:d.o,why:why};
+  await idbRun(['snaps'],x=>x.objectStore('snaps').add(rec));
+  const all=(await snapsFor(rec.id)).sort((a,b)=>b.at-a.at),drop=all.slice(12);
+  if(drop.length)await idbRun(['snaps'],x=>drop.forEach(v=>x.objectStore('snaps').delete(v.sid)));
+}
+function autoSnap(id){const now=Date.now();if(now-(lastSnap[id]||0)<120000)return;lastSnap[id]=now;const d=lib.docs[id];if(d&&(d.h||'').length>20)snapDoc(d,'auto',id).catch(()=>{})}
+function openSnap(id){if(opened.has(id))return;opened.add(id);const d=lib.docs[id];if(d&&(d.h||'').replace(/<[^>]+>/g,'').trim()){lastSnap[id]=Date.now();snapDoc(d,'opened',id).catch(()=>{})}}
+async function trashDoc(d,id){if(useLS||!idb)return;await idbRun(['trash'],x=>x.objectStore('trash').add({id:id,deletedAt:Date.now(),doc:d}))}
+async function purgeTrash(){try{const all=await idbAll('trash'),old=all.filter(x=>Date.now()-x.deletedAt>30*864e5);if(old.length)await idbRun(['trash'],x=>old.forEach(v=>x.objectStore('trash').delete(v.sid)))}catch(e){}}
 function getCaret(){const s=getSelection();if(!s.rangeCount||!ed.contains(s.anchorNode))return null;const r=document.createRange();r.selectNodeContents(ed);r.setEnd(s.anchorNode,s.anchorOffset);return r.toString().length}
 function setCaret(off){const w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT);let n,acc=0;while((n=w.nextNode())){const l=n.nodeValue.length;if(acc+l>=off){const r=document.createRange();r.setStart(n,off-acc);r.collapse(true);const s=getSelection();s.removeAllRanges();s.addRange(r);return}acc+=l}}
 function restoreView(d){requestAnimationFrame(()=>{$('main').scrollTop=(d&&d.sc)||0;if(d&&d.c)setCaret(d.c)})}
@@ -395,14 +479,20 @@ function snap(){const o={t:title.value,h:ed.innerHTML,m:mode,g:goal,s:dstate,r:r
 function save(){
   try{
     const s=snap(),o=lib.docs[lib.cur];
-    if(o){const same=dkey(o)===dkey(s);lib.docs[lib.cur]=Object.assign({},o,s,{at:same?o.at:Date.now()})}
-    localStorage.setItem(LK,JSON.stringify(lib));st.textContent='Saved'
+    if(o){const same=dkey(o)===dkey(s);lib.docs[lib.cur]=Object.assign({},o,s,{id:lib.cur,at:same?o.at:Date.now()});if(!same)autoSnap(lib.cur)}
+    bufWrite();
+    flush().then(()=>{st.textContent='Saved'}).catch(()=>{st.textContent='Could not save: storage full or blocked'});
   }catch(e){st.textContent='Could not save: storage full or blocked'}
 }
 function blank(m){return{t:'',h:'',m:m||'prose',g:0,s:'draft',r:[],o:'',at:Date.now()}}
 function loadDoc(id){const d=lib.docs[id];lib.cur=id;title.value=d.t||'';ed.innerHTML=d.h||'';mode=d.m||'prose';goal=d.g||0;dstate=d.s||'draft';refs=d.r||[];$('#thesisbox').value=d.o||'';$('#thesis').open=!!d.o}
 function queue(){st.textContent='Saving...';words();updTab();clearTimeout(t);t=setTimeout(save,600)}
-try{const l=JSON.parse(localStorage.getItem(LK)||'null');if(l&&l.docs)lib=l}catch(e){}
+await bootStore();
+let recovered=false;
+try{
+  const b=JSON.parse(localStorage.getItem('afrowriter:buf')||'null'),d=b&&lib.docs[b.id];
+  if(d&&b.at>(d.at||0)&&b.h!==d.h){snapDoc(d,'before recovery',b.id).catch(()=>{});Object.assign(d,{t:b.t,h:b.h,m:b.m,g:b.g,s:b.s,r:b.r,o:b.o,at:b.at});lib.cur=b.id;recovered=true}
+}catch(e){}
 if(!lib.docs[lib.cur]){
   const ids=Object.keys(lib.docs);
   if(ids.length)lib.cur=ids.sort((a,b)=>lib.docs[b].at-lib.docs[a].at)[0];
@@ -411,10 +501,11 @@ if(!lib.docs[lib.cur]){
 }
 if(!Array.isArray(lib.open))lib.open=[];lib.open=lib.open.filter(x=>lib.docs[x]);if(!lib.open.includes(lib.cur))lib.open.push(lib.cur);
 loadDoc(lib.cur);restoreView(lib.docs[lib.cur]);
-words();
+words();openSnap(lib.cur);flush().catch(()=>{});if(recovered)setTimeout(()=>{st.textContent='Recovered your latest changes'},700);if(useLS)setTimeout(()=>{st.textContent='Basic storage in use'},900);
 ed.addEventListener('input',queue);title.addEventListener('input',queue);
 ed.addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'))});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeout(t);save()}});
+addEventListener('pagehide',()=>{clearTimeout(t);save()});
 $('#bar').addEventListener('mousedown',e=>{if(e.target.tagName!=='SELECT')e.preventDefault()});
 $('#bar').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
@@ -430,7 +521,7 @@ $('#bar').addEventListener('click',e=>{
   if(b.dataset.a==='dbl'){P.dbl=!P.dbl;apply();return}
   ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);queue();
 });
-function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);const vw={sc:lib.docs[id].sc,c:lib.docs[id].c};if(!lib.open.includes(id))lib.open.push(id);setMode(mode,true);words();save();renderTabs();paintState();scrollTo(0,0);restoreView(vw)}
+function openDoc(id){clearTimeout(t);save();rng=null;loadDoc(id);openSnap(id);const vw={sc:lib.docs[id].sc,c:lib.docs[id].c};if(!lib.open.includes(id))lib.open.push(id);setMode(mode,true);words();save();renderTabs();paintState();scrollTo(0,0);restoreView(vw)}
 function newPiece(){closeDocs();$('#lastcard').hidden=true;$('#pktitle').textContent='What are you writing?';$('#picker').hidden=false}
 function makePiece(m){
   clearTimeout(t);save();
@@ -472,7 +563,7 @@ $('#tabs').addEventListener('click',e=>{
 function paintState(){const b=$('#state'),f=dstate==='final';b.textContent=trs(f?'Finished':'Draft');b.classList.toggle('fin',f);b.setAttribute('aria-label',trs(f?'Finished. Tap to mark as draft':'Draft. Tap to mark as finished'))}
 $('#state').onclick=()=>{dstate=dstate==='final'?'draft':'final';paintState();queue()};
 $('.flt').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;dfilter=b.dataset.f;document.querySelectorAll('.flt button').forEach(x=>x.classList.toggle('on',x===b));renderDocs()});
-function openDocs(){clearTimeout(t);save();renderDocs();$('#docs').hidden=false}
+function openDocs(){clearTimeout(t);save();renderDocs();bkInfo();$('#docs').hidden=false}
 function closeDocs(){$('#docs').hidden=true}
 $('#docsbtn').onclick=openDocs;$('#dclose').onclick=closeDocs;$('#dnew').onclick=newPiece;
 $('#docs').addEventListener('click',e=>{if(e.target.id==='docs')closeDocs()});
@@ -482,7 +573,7 @@ $('#dlist').addEventListener('click',e=>{
   if(e.target.closest('[data-r]')){const v=prompt(trs('Rename this piece'),d.t||'');if(v!==null){d.t=v.trim();if(id===lib.cur)title.value=d.t;save();renderDocs();renderTabs()}return}
   if(e.target.closest('[data-x]')){
     if(!confirm(trf('Delete "{title}" from this device? This cannot be undone.',{title:d.t||trs('Untitled')})))return;
-    delete lib.docs[id];lib.open=lib.open.filter(x=>x!==id);
+    trashDoc(d,id).catch(()=>{});delete lib.docs[id];lib.open=lib.open.filter(x=>x!==id);
     if(id===lib.cur){const ids=Object.keys(lib.docs).sort((a,b)=>lib.docs[b].at-lib.docs[a].at);const nid=lib.open[0]||ids[0]||uid();if(!lib.docs[nid])lib.docs[nid]=blank(mode);openDoc(nid)}
     else{save();renderTabs()}
     renderDocs();return
@@ -607,29 +698,23 @@ function buildDocx(root,ttl,md,dbl,fam,tfam){
 }
 
 function slug(){return(title.value.trim()||'AfroWriter').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').slice(0,60)||'AfroWriter'}
+async function saveOut(blob,name,type,ext,desc){
+  if(window.showSaveFilePicker){
+    const fh=await window.showSaveFilePicker({suggestedName:name,types:[{description:desc,accept:{[type]:[ext]}}]});
+    const w=await fh.createWritable();await w.write(blob);await w.close();return
+  }
+  const file=new File([blob],name,{type});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:desc});return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)
+}
 async function doDocx(){
   clearTimeout(t);save();
   const first=mode==='script'?'Courier New':P.f.split(',')[0].replace(/['"]/g,'').trim();
   const tfirst=P.tf.split(',')[0].replace(/['"]/g,'').trim();
   const blob=buildDocx(ed,title.value.trim(),mode,!!P.dbl,/system-ui/.test(first)?'Calibri':first,tfirst);
-  const name=slug()+'.docx',type=blob.type;
-  try{
-    if(window.showSaveFilePicker){
-      /* PC browsers and the desktop app: a real "Save as" window */
-      const fh=await window.showSaveFilePicker({suggestedName:name,types:[{description:'Word document',accept:{[type]:['.docx']}}]});
-      const w=await fh.createWritable();await w.write(blob);await w.close();
-    }else{
-      const file=new File([blob],name,{type});
-      if(navigator.canShare&&navigator.canShare({files:[file]})){
-        /* phones: the share sheet, which has "Save to Files" on iPhone */
-        await navigator.share({files:[file],title:title.value.trim()||'AfroWriter'});
-      }else{
-        const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
-        document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-      }
-    }
-    st.textContent='Word file ready'
-  }catch(e){if(e&&e.name==='AbortError')return;st.textContent='Could not save: storage full or blocked'}
+  try{await saveOut(blob,slug()+'.docx',blob.type,'.docx','Word document');st.textContent='Word file ready'}
+  catch(e){if(e&&e.name==='AbortError')return;st.textContent='Could not save: storage full or blocked'}
 }
 function doPdf(){
   clearTimeout(t);save();const old=document.title;document.title=title.value.trim()||'AfroWriter';
@@ -786,6 +871,91 @@ $('#findbar').addEventListener('click',e=>{
 });
 
 /* ---------- Side sheets: contents, syllables, references, entries ---------- */
+
+/* ---------- Backup and restore: one .afw file, kept wherever you like ---------- */
+const fnv=s=>{let x=0x811c9dc5;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,0x01000193)>>>0}return x.toString(16)};
+const ALLOWED=new Set(['DIV','P','BR','B','STRONG','I','EM','U','SPAN','H1','H2','H3','H4','UL','OL','LI']),CLS=/^(jd|sec|sb|ref|mood|s-[hacdpt])$/;
+function cleanNode(n){
+  [...n.childNodes].forEach(c=>{
+    if(c.nodeType===3)return;
+    if(c.nodeType!==1){c.remove();return}
+    if(/^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|LINK|META|TEMPLATE|NOSCRIPT|SVG|MATH|FORM|INPUT|BUTTON|TEXTAREA|SELECT)$/i.test(c.tagName)){c.remove();return}
+    if(!ALLOWED.has(c.tagName)){c.replaceWith(document.createTextNode(c.textContent));return}
+    [...c.attributes].forEach(a=>{
+      if(a.name==='class'){const k=a.value.split(/\s+/).filter(x=>CLS.test(x)).join(' ');k?c.setAttribute('class',k):c.removeAttribute('class')}
+      else if(!(a.name==='data-d'&&/^\d{4}-\d\d-\d\d$/.test(a.value)))c.removeAttribute(a.name)
+    });
+    cleanNode(c)
+  })
+}
+function cleanHtml(s){const x=document.createElement('template');x.innerHTML=s;cleanNode(x.content);return x.innerHTML}
+const MODES=['prose','poem','lyrics','essay','journal','script'];
+function sanitizeDoc(r){
+  if(!r||typeof r!=='object')return null;
+  const str=(x,m)=>typeof x==='string'?x.slice(0,m):'';
+  const refs=Array.isArray(r.r)?r.r.slice(0,500).filter(x=>x&&typeof x==='object').map(x=>({k:str(x.k,12),a:str(x.a,300),y:str(x.y,12),t:str(x.t,400),s:str(x.s,300),d:str(x.d,100),u:str(x.u,500)})):[];
+  return{t:str(r.t,300),h:cleanHtml(str(r.h,5e6)),m:MODES.includes(r.m)?r.m:'prose',g:Math.max(0,parseInt(r.g)||0),s:r.s==='final'?'final':'draft',r:refs,o:str(r.o,20000),at:Number(r.at)||Date.now()}
+}
+function bkInfo(msg){$('#bkinfo').textContent=msg||('Stored only on this device. '+(P.lastBackup?'Last backup '+ago(P.lastBackup)+'.':'No backup yet.'))}
+function buildBackup(){
+  save();
+  const docs=Object.keys(lib.docs).map(id=>Object.assign({},lib.docs[id],{id}));
+  return JSON.stringify({afw:1,app:'AfroWriter',version:1,saved:new Date().toISOString(),count:docs.length,sum:fnv(JSON.stringify(docs)),state:{cur:lib.cur,open:lib.open},docs})
+}
+async function doBackup(){
+  const blob=new Blob([buildBackup()],{type:'text/plain'}),name='AfroWriter-backup-'+iso(new Date())+'.afw';
+  try{await saveOut(blob,name,'text/plain','.afw','AfroWriter backup');P.lastBackup=Date.now();apply();bkInfo('Backup saved. Keep the .afw file somewhere safe.')}
+  catch(e){if(e&&e.name==='AbortError')return;bkInfo('Could not save the backup file.')}
+}
+async function doRestore(f){
+  let data;
+  try{data=JSON.parse(await f.text())}catch(e){bkInfo('That file could not be read. Is it an AfroWriter backup?');return}
+  if(!data||data.afw!==1||!Array.isArray(data.docs)){bkInfo('That does not look like an AfroWriter backup (.afw).');return}
+  if(data.version>1){bkInfo('This backup comes from a newer AfroWriter. Update the app first.');return}
+  if(fnv(JSON.stringify(data.docs))!==data.sum&&!confirm('This backup file has been changed since it was saved. Restore it anyway?'))return;
+  const n=data.docs.length;
+  if(!confirm('Restore '+n+' piece'+(n===1?'':'s')+(data.saved?' saved on '+new Date(data.saved).toLocaleDateString():'')+'? Nothing you have now will be replaced.'))return;
+  save();let added=0,same=0,copies=0;const now=Date.now();
+  for(const raw of data.docs){
+    const c=sanitizeDoc(raw);if(!c)continue;
+    const id=/^[\w-]{1,40}$/.test(String(raw.id||''))?String(raw.id):uid(),ex=lib.docs[id];
+    if(!ex){lib.docs[id]=Object.assign({},c,{id});added++}
+    else if(ex.h===c.h&&ex.t===c.t)same++;
+    else{const nid=uid();lib.docs[nid]=Object.assign({},c,{id:nid,t:(c.t||'Untitled')+' (restored)',at:now});copies++}
+  }
+  await flush().catch(()=>{});renderDocs();renderTabs();
+  bkInfo('Restored '+added+' new'+(copies?', '+copies+' kept as copies':'')+(same?', '+same+' already here':'')+'.')
+}
+$('#bkbtn').onclick=doBackup;
+$('#rsbtn').onclick=()=>$('#rfile').click();
+$('#rfile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f)doRestore(f)});
+$('#rcbtn').onclick=()=>{closeDocs();openSide('recover')};
+const when=ts=>new Date(ts).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+async function renderRecover(body){
+  body.innerHTML='<div class="note">Looking for earlier versions...</div>';
+  if(useLS||!idb){body.innerHTML='<div class="note">Recovery needs the on-device database, which this browser is not allowing.</div>';return}
+  const snaps=(await snapsFor(lib.cur)).sort((a,b)=>b.at-a.at),trash=(await idbAll('trash')).sort((a,b)=>b.deletedAt-a.deletedAt);
+  body.innerHTML='<div class="sh">Earlier versions of this piece</div>'+
+    (snaps.length?snaps.map(s=>'<div class="rr"><span>'+esc(when(s.at))+' \u00b7 '+wcount(s.h)+' words</span><button data-rv="'+s.sid+'">Restore</button></div>').join(''):'<div class="note">None yet. They are saved automatically as you write.</div>')+
+    '<div class="sh">Recently deleted</div>'+
+    (trash.length?trash.map(x=>'<div class="rr"><span>'+esc(x.doc.t||'Untitled')+' \u00b7 deleted '+esc(ago(x.deletedAt))+'</span><button data-rt="'+x.sid+'">Bring back</button></div>').join(''):'<div class="note">Nothing deleted recently. Deleted pieces are kept for 30 days.</div>');
+  body.onclick=async e=>{
+    const rv=e.target.closest('[data-rv]'),rt=e.target.closest('[data-rt]');
+    if(rv){
+      const s=snaps.find(x=>x.sid===+rv.dataset.rv);if(!s)return;
+      if(!confirm('Replace the current text with the version from '+when(s.at)+'? The current text is saved first, so you can come back to it.'))return;
+      save();await snapDoc(lib.docs[lib.cur],'before restoring an earlier version',lib.cur);
+      Object.assign(lib.docs[lib.cur],{t:s.t,h:s.h,m:s.m,g:s.g,s:s.s,r:s.r,o:s.o,at:Date.now()});
+      loadDoc(lib.cur);setMode(mode,true);words();renderTabs();paintState();save();closeSide()
+    }else if(rt){
+      const x=trash.find(v=>v.sid===+rt.dataset.rt);if(!x)return;
+      let id=x.id;if(lib.docs[id])id=uid();
+      lib.docs[id]=Object.assign({},x.doc,{id,at:Date.now()});
+      await idbRun(['trash'],y=>y.objectStore('trash').delete(x.sid));
+      openDoc(id);closeSide()
+    }
+  }
+}
 let sideKind=null;
 function closeSide(){$('#side').hidden=true;sideKind=null}
 $('#sideclose').onclick=closeSide;
@@ -808,12 +978,13 @@ function refHtml(r){
 }
 function renderSide(){
   const body=$('#sidebody');
-  const T={toc:'Contents',syl:'Syllables',refs:'References',entries:'Journal entries',scenes:'Scenes'}[sideKind];
+  const T={toc:'Contents',syl:'Syllables',refs:'References',entries:'Journal entries',scenes:'Scenes',recover:'Recovery'}[sideKind];
   $('#sidetitle').textContent=T;
   if(sideKind==='toc'){
     const hs=[...ed.querySelectorAll('h1,h2,h3,h4')];
     body.innerHTML=hs.length?hs.map((x,i)=>'<button class="tocr l'+x.tagName[1]+'" data-i="'+i+'">'+esc(x.textContent||trs('(empty heading)'))+'</button>').join(''):'<div class="note">No headings yet. Use Styles to add Heading 1 to 4 and they will appear here.</div>';
     body.onclick=e=>{const b=e.target.closest('.tocr');if(b)jump(hs[+b.dataset.i])};
+  }else if(sideKind==='recover'){renderRecover(body);
   }else if(sideKind==='scenes'){
     const ss=[...ed.querySelectorAll('.s-h')].filter(x=>x.textContent.trim());
     body.innerHTML=ss.length?ss.map((x,i)=>'<button class="tocr" data-i="'+i+'">'+(i+1)+'. '+esc(x.textContent.trim().toUpperCase())+'</button>').join(''):'<div class="note">No scenes yet. Set a line to Scene Heading, like INT. KITCHEN - DAY.</div>';
@@ -863,6 +1034,7 @@ if('serviceWorker' in navigator){
     if(a!==ed&&a!==title){save();location.reload()}
   });
 }
+})().catch(e=>{console.error('AfroWriter failed to start',e);const s=document.getElementById('splash');if(s)s.remove()});
 </script>
 </body>
 </html>
